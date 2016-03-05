@@ -1,0 +1,38 @@
+#! /bin/sh
+
+clock() {
+    date '+%a %d %b - %H:%M:%S'
+}
+
+battery() {
+    BATC=/sys/class/power_supply/BAT0/capacity
+    BATS=/sys/class/power_supply/BAT0/status
+
+    # prepend percentage with a '+' if charging, '-' otherwise
+    test "`cat $BATS`" = "Charging" && echo -n '+'
+
+    # print out the content (forced myself to use `sed` :P)
+    sed -n p $BATC
+}
+
+volume() {
+    #VOLC=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p')
+    VOLC=$(amixer get Master | awk -F'[][]' '/%/ { print $2 }' | uniq)
+    if amixer get Master | grep -q off
+    then
+        VOLC="M$VOLC"
+    fi
+    echo "$VOLC"
+}
+
+network() {
+    WIFI_SSID=$(iw wlp1s0 link | grep 'SSID' | sed 's/SSID: //' | sed 's/\t//')
+    test "$WIFI_SSID" != "" && echo $WIFI_SSID || echo "N/A"
+}
+
+
+while :; do
+    BAR_INPUT="B$(battery)\nC$(clock)\nN$(network)"
+    echo -e $BAR_INPUT
+    sleep 1
+done

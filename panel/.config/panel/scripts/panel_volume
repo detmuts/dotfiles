@@ -1,0 +1,17 @@
+#! /bin/sh
+
+volume() {
+    #VOLC=$(amixer get Master | sed -n 'N;s/^.*\[\([0-9]\+%\).*$/\1/p')
+    VOLC=$(amixer get Master | awk -F'[][]' '/%/ { print $2 }' | uniq)
+    if amixer get Master | grep -q off
+    then
+        VOLC="M$VOLC"
+    fi
+    echo "$VOLC"
+}
+
+while :; do
+    BAR_INPUT="V$(volume)"
+    echo -e $BAR_INPUT
+    sleep 0.5
+done

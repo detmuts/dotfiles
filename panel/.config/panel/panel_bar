@@ -1,0 +1,138 @@
+#! /bin/sh
+#
+# Example panel for lemonbar
+
+. panel_colors
+
+SYS_PAD="     "
+WS_PAD="  "
+num_mon=$(bspc query -M | wc -l)
+
+while read -r line ; do
+	case $line in
+        # sysinfo output
+		B*)
+            BATTERY=${line#?}
+            BAT_ICON=""
+            FG_COLOR=$COLOR_SYS_FG
+            BG_COLOR=$COLOR_SYS_BG
+            if [[ $BATTERY == \+* ]]; then
+                BG_COLOR=$BAT_GREEN_BG
+                BATTERY=${BATTERY#?}
+            elif [[ $BATTERY -ge 90 ]]; then
+                BG_COLOR=$BAT_GREEN_BG
+                BAT_ICON=""
+            elif [[ $BATTERY -ge 70 ]]; then
+                BG_COLOR=$BAT_GREEN_BG
+                BAT_ICON=""
+            elif [[ $BATTERY -ge 20 ]]; then
+                BG_COLOR=$BAT_YELLOW_BG
+                BAT_ICON=""
+            else
+                BG_COLOR=$BAT_RED_BG
+                BAT_ICON=""
+            fi
+            bat_time=$(acpi -b | awk -F',[ ]*' '{ print $3 }' | sed 's/:/\\\\:/g')
+            bat="%{F$FG_COLOR}%{B$BG_COLOR}%{A:notify-send "remaining" "$(acpi -b | awk -F',[ ]*' '{ print $3 }' | sed 's/:/\\\\:/g' | cut -d ' ' -f 1)" -t 1000:}$SYS_PAD $BAT_ICON  $BATTERY% $SYS_PAD%{A}%{B-}%{F-}"
+            ;;
+        V*)
+            VOLUME=${line#?}
+            VOL_ICON=""
+            FG_COLOR=$COLOR_SYS_FG
+            BG_COLOR=$VOL_WHITE_BG
+            if [[ $VOLUME == M*  ]]; then
+                FG_COLOR=$VOL_GREY_FG
+                BG_COLOR=$VOL_GREY_BG
+                VOLUME=${VOLUME#?}
+
+            fi
+            vol="%{F$FG_COLOR}%{B$BG_COLOR}%{A3:amixer -D pulse set Master Playback Switch toggle:}$SYS_PAD $VOL_ICON  $VOLUME $SYS_PAD%{A}%{B-}%{F-}"
+            ;;
+        N*)
+            FG_COLOR=$COLOR_SYS_FG
+            BG_COLOR=$NET_BG
+            NET_ICON=""
+            net="%{F$FG_COLOR}%{B$BG_COLOR}$SYS_PAD $NET_ICON  ${line#?} $SYS_PAD%{B-}%{F-}"
+            ;;
+        C*)
+            FG_COLOR=$COLOR_SYS_FG
+            BG_COLOR=$TIME_BG
+            CLOCK_ICON=""
+            clock="%{F$FG_COLOR}%{B$BG_COLOR}$SYS_PAD $CLOCK_ICON  ${line#?} $SYS_PAD%{B-}%{F-}"
+            ;;
+		T*)
+			# xtitle output
+            TITLE=$(echo ${line#?} | awk 'BEGIN{FS="[ ]*-[ ]*"; OFS=" - "} { for (i=NF; i>0; i--) { printf "%s", $i;if (i>1) { printf "%s", OFS; }}}' | cut -c 1-50)
+			title="%{F$COLOR_TITLE_FG}%{B$COLOR_TITLE_BG} $TITLE %{B-}%{F-}"
+			;;
+		W*)
+			# bspwm's state
+			wm=""
+			IFS=':'
+			set -- ${line#?}
+			while [ $# -gt 0 ] ; do
+				item=$1
+				name=${item#?}
+				case $item in
+					[mM]*)
+						[ $num_mon -lt 2 ] && shift && continue
+						case $item in
+							m*)
+								# monitor
+								FG=$COLOR_MONITOR_FG
+								BG=$COLOR_MONITOR_BG
+								;;
+							M*)
+								# focused monitor
+								FG=$COLOR_FOCUSED_MONITOR_FG
+								BG=$COLOR_FOCUSED_MONITOR_BG
+								;;
+						esac
+						wm="${wm}%{F${FG}}%{B${BG}}%{A:bspc monitor -f ${name}:} ${name} %{A}%{B-}%{F-}"
+						;;
+					[fFoOuU]*)
+						case $item in
+							f*)
+								# free desktop
+								FG=$COLOR_FREE_FG
+								BG=$COLOR_FREE_BG
+								;;
+							F*)
+								# focused free desktop
+								FG=$COLOR_FOCUSED_FREE_FG
+								BG=$COLOR_FOCUSED_FREE_BG
+								;;
+							o*)
+								# occupied desktop
+								FG=$COLOR_OCCUPIED_FG
+								BG=$COLOR_OCCUPIED_BG
+								;;
+							O*)
+								# focused occupied desktop
+								FG=$COLOR_FOCUSED_OCCUPIED_FG
+								BG=$COLOR_FOCUSED_OCCUPIED_BG
+								;;
+							u*)
+								# urgent desktop
+								FG=$COLOR_URGENT_FG
+								BG=$COLOR_URGENT_BG
+								;;
+							U*)
+								# focused urgent desktop
+								FG=$COLOR_FOCUSED_URGENT_FG
+								BG=$COLOR_FOCUSED_URGENT_BG
+								;;
+						esac
+						wm="${wm}%{F${FG}}%{B${BG}}%{A:bspc desktop -f ${name}:}$WS_PAD ${name} $WS_PAD%{A}%{B-}%{F-}"
+						;;
+					[LTG]*)
+						# layout, state and flags
+						wm="${wm}%{F$COLOR_STATE_FG}%{B$COLOR_STATE_BG} ${name} %{B-}%{F-}"
+						;;
+				esac
+				shift
+			done
+			;;
+	esac
+	printf "%s\n" "%{l}${wm}%{c}${title}%{r}${net}${bat}${vol}${clock}"
+done

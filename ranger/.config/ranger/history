@@ -1,0 +1,14 @@
+rename assets
+mkdir css
+mkdir Nightwish
+rename Endless Forms Most Beautiful (2015)
+rename CD2 (Instrumental)
+rename CD3 (Orchestral)
+rename CD1 (Original)
+search nrp
+open_with vim
+open_with 
+mv lab1_ lab1
+shell mv lab1_ lab1
+shell 7za e lab1.zip lab1
+delete
