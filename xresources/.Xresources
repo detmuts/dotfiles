@@ -1,0 +1,65 @@
+! General settings
+*.font:	xft:Inconsolata:size=10, \
+        xft:Icons:Regular:size=10
+
+! Xft settings
+Xft.dpi: 96
+Xft.antialias: true
+Xft.rgba: rgb
+Xft.hinting: true
+Xft.hintstyle: hintslight
+
+! Color theme
+!! Base16 Ocean
+!base00 383735
+#define base00 #363B45
+!change base 01 for dark colour in executables
+#define base01 #779DB8
+!change base 02 for dark colour in time
+#define base02 #6D7C8A
+#define base03 #65737e
+#define base04 #a7adba
+#define base05 #c0c5ce
+#define base06 #dfe1e8
+#define base07 #eff1f5
+!change base 08 for red
+#define base08 #B86A72
+#define base09 #d08770
+#define base0A #ebcb8b
+#define base0B #a3be8c
+#define base0C #96b5b4
+#define base0D #8fa1b3
+#define base0E #b48ead
+#define base0F #ab7967
+
+*.foreground:   base05
+*.background:   base00
+*.cursorColor:  base05
+
+*.color0:       base00
+*.color1:       base08
+*.color2:       base0B
+*.color3:       base0A
+*.color4:       base0D
+*.color5:       base0E
+*.color6:       base0C
+*.color7:       base05
+
+*.color8:       base03
+*.color9:       base09
+*.color10:      base01
+*.color11:      base02
+*.color12:      base04
+*.color13:      base06
+*.color14:      base0F
+
+! URxvt settings
+URxvt.scrollBar: false
+URxvt.font: xft:Anonymous Pro for Powerline:pixelsize=17, \
+            xft:DejaVu Sans Mono for Powerline:size=11, \
+            xft:Icons:size=9
+
+URxvt.boldFont: xft:Anonymous Pro for Powerline:bold:pixelsize=17, \
+            xft:DejaVu Sans Mono for Powerline:bold:size=11, \
+            xft:Icons:size=9
+! URxvt.letterSpace: -1
