@@ -1,6 +1,6 @@
 " Plugged
 " -------
-call plug#begin('~/.vim/plugged')
+call plug#begin('~/.config/nvim/plugged')
 
 "Editing
 Plug 'junegunn/vim-easy-align', { 'on': ['<PLug>(EasyAlign)', 'EasyAlign'] }
@@ -36,7 +36,6 @@ let g:plug_timeout=6000
 " General settings
 " ----------------
 syntax on
-set nocompatible
 set lazyredraw
 set noswapfile
 set autoindent
@@ -89,16 +88,6 @@ let delimitMate_expand_space=1
 
 " Ultisnips
 let g:UltiSnipsExpandTrigger="<C-l>"
-
-" YouCompleteMe
-let g:ycm_global_ycm_extra_conf="~/.vim/plugged/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
-let g:ycm_autoclose_preview_window_after_completion=1
-let g:ycm_autoclose_preview_window_after_insertion=1
-let g:ycm_collect_identifiers_from_tags_files = 1 " Let YCM read tags from Ctags file
-let g:ycm_use_ultisnips_completer = 1 " Default 1, just ensure
-let g:ycm_seed_identifiers_with_syntax = 1 " Completion for programming language's keyword
-let g:ycm_complete_in_comments = 1 " Completion in comments
-let g:ycm_complete_in_strings = 1 " Completion in string
 
 " Grepper
 nmap <Leader>ag :Grepper -tool ag -open -switch<cr>
