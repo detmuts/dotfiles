@@ -10,6 +10,7 @@ Plug 'scrooloose/nerdcommenter'
 Plug 'scrooloose/syntastic'
 Plug 'Raimondi/delimitmate'
 Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
+Plug 'Shougo/deoplete.nvim'
 
 "Searching
 Plug 'mhinz/vim-grepper', { 'on': 'Grepper' }
@@ -88,6 +89,10 @@ let delimitMate_expand_space=1
 
 " Ultisnips
 let g:UltiSnipsExpandTrigger="<C-l>"
+
+" Deoplete.nvim
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#sources._ = ['buffer', 'file', 'ultisnips']
 
 " Grepper
 nmap <Leader>ag :Grepper -tool ag -open -switch<cr>
