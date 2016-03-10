@@ -26,10 +26,10 @@ bspc desktop ^4 --layout monocle
 bspc rule -a Gimp               desktop=^8 state=floating follow=on
 bspc rule -a Firefox            desktop=^2
 bspc rule -a qutebrowser        desktop=^2
-bspc rule -a *:mpv-youtube      desktop=^2
 bspc rule -a *:libreoffice      desktop=^4
 bspc rule -a Zathura            desktop=^4
 bspc rule -a mpv                desktop=^4 follow=on
+bspc rule -a *:mpv-youtube      desktop=^2
 bspc rule -a NetBeans\ IDE\ 8.1 desktop=^3
 bspc rule -a VirtualBox         desktop=^3
 

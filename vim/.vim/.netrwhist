@@ -1,8 +1,0 @@
-let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =6
-let g:netrw_dirhist_1='/home/detlev/.config/gtk-3.0'
-let g:netrw_dirhist_2='/home/detlev/.config/sxhkd'
-let g:netrw_dirhist_3='/boot/loader/entries'
-let g:netrw_dirhist_4='/etc/pm/sleep.d'
-let g:netrw_dirhist_5='/etc/systemd/system/suspend.target.wants'
-let g:netrw_dirhist_6='/home/detlev/Documents/aichallenge/visualize'
