@@ -1,0 +1,3 @@
+/neovim/.config/nvim/*
+!/neovim/.config/nvim/init.vim
+!/.gitignore
