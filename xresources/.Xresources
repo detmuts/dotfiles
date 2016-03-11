@@ -9,49 +9,36 @@ Xft.rgba: rgb
 Xft.hinting: true
 Xft.hintstyle: hintslight
 
-! Color theme
-!! Base16 Ocean
-!base00 383735
-#define base00 #363B45
-!change base 01 for dark colour in executables
-#define base01 #779DB8
-!change base 02 for dark colour in time
-#define base02 #6D7C8A
-#define base03 #65737e
-#define base04 #a7adba
-#define base05 #c0c5ce
-#define base06 #dfe1e8
-#define base07 #eff1f5
-!change base 08 for red
-#define base08 #B86A72
-#define base09 #d08770
-#define base0A #ebcb8b
-#define base0B #a3be8c
-#define base0C #96b5b4
-#define base0D #8fa1b3
-#define base0E #b48ead
-#define base0F #ab7967
+! Hybrid Terminal Colours. Uses the palette from Tomorrow-Night:
+! https://github.com/chriskempson/tomorrow-theme/blob/master/vim/colors/Tomorrow-Night.vim
+! vim: ft=xdefaults
 
-*.foreground:   base05
-*.background:   base00
-*.cursorColor:  base05
-
-*.color0:       base00
-*.color1:       base08
-*.color2:       base0B
-*.color3:       base0A
-*.color4:       base0D
-*.color5:       base0E
-*.color6:       base0C
-*.color7:       base05
-
-*.color8:       base03
-*.color9:       base09
-*.color10:      base01
-*.color11:      base02
-*.color12:      base04
-*.color13:      base06
-*.color14:      base0F
+*background: #363B45
+*foreground: #C5C8C6
+! black
+*color8: #65737E
+*color0: #363B45
+! red
+*color9: #A54242
+*color1: #CC6666
+! green
+*color10: #8C9440
+*color2: #B5BD68
+! yellow
+*color11: #DE935F
+*color3: #F0C674
+! blue
+*color12: #5F819D
+*color4: #81A2BE
+! magenta
+*color13: #85678F
+*color5: #B294BB
+! cyan
+*color14: #5E8D87
+*color6: #8ABEB7
+! white
+*color15: #707880
+*color7: #C5C8C6
 
 ! URxvt settings
 URxvt.scrollBar: false

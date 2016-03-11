@@ -5,14 +5,15 @@ call plug#begin('~/.config/nvim/plugged')
 "Editing
 Plug 'junegunn/vim-easy-align', { 'on': ['<PLug>(EasyAlign)', 'EasyAlign'] }
 Plug 'junegunn/goyo.vim'
+Plug 'Raimondi/delimitmate'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'scrooloose/nerdcommenter'
 Plug 'scrooloose/syntastic'
-Plug 'Raimondi/delimitmate'
 Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 Plug 'Shougo/deoplete.nvim'
 Plug 'Shougo/echodoc.vim', { 'on': 'EchoDocEnable' }
 Plug 'Shougo/context_filetype.vim'
+"Plug 'tpope/surround-vim'
 
 "Searching
 Plug 'mhinz/vim-grepper', { 'on': 'Grepper' }
@@ -69,8 +70,11 @@ set smartcase
 nnoremap Q <nop>
 nnoremap <silent> <C-l> :nohl<CR><C-l>
 
+" Show whitespace
+set list
+set listchars=tab:\ \ ,trail:·
+
 " Colorscheme
-set background=dark
 colorscheme hybrid_reverse
 
 " Clipboard
@@ -118,11 +122,14 @@ nmap <Leader>g :Goyo<CR>
 let g:goyo_width=80
 let g:goyo_heigth=85
 
+" Colourscheme
+let g:enable_bold_font = 1
+
 " Airline
 set rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim
 set laststatus=2
 let g:airline_powerline_fonts=1
 let g:airline_exclude_preview=1
-let g:airline_theme='base16_ocean'
+let g:airline_theme='hybridline'
 let g:airline_left_sep=''
 let g:airline_right_sep=''
