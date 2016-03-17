@@ -1,1 +1,4 @@
+/qutebrowser/.config/qutebrowser/*
+!/qutebrowser/.config/qutebrowser/keys.conf
+!/qutebrowser/.config/qutebrowser/qutebrowser.conf
 !/.gitignore

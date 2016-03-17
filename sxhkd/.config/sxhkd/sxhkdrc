@@ -14,7 +14,7 @@ super + space
 	j4-dmenu-desktop --dmenu="dmenu -i -l 3 -p '\\_' -nb '#363B45' -nf '#8C8C8C' -sf '#FFFFFF' -sb '#363B45' -fn 'Noto Sans-11'" --term='urxvt'
 
 # lockscreen
-super + shift + l
+super + shift + b
     xsecurelock auth_pam_x11 saver_blank
 
 # make sxhkd reload its configuration files:

@@ -123,6 +123,7 @@ let g:goyo_width=80
 let g:goyo_heigth=85
 
 " Colourscheme
+let g:hybrid_use_Xresources = 1
 let g:enable_bold_font = 1
 
 " Airline
@@ -130,6 +131,8 @@ set rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim
 set laststatus=2
 let g:airline_powerline_fonts=1
 let g:airline_exclude_preview=1
-let g:airline_theme='hybridline'
+let g:airline_theme='base16_ocean'
 let g:airline_left_sep=''
 let g:airline_right_sep=''
+
+autocmd FileType html,javascript setlocal shiftwidth=2 tabstop=2

@@ -16,7 +16,7 @@ if [[ ! -d "$DIR" ]]; then
 fi
 
 PANEL_HEIGHT=25
-PANEL_FONT='Noto Sans:size=11'
+PANEL_FONT="NotoSans:size=11"
 PANEL_ICON_FONT="icons-12"
 
 bspc config top_padding $PANEL_HEIGHT
