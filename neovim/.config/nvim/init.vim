@@ -13,7 +13,6 @@ Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 Plug 'Shougo/deoplete.nvim'
 Plug 'Shougo/echodoc.vim', { 'on': 'EchoDocEnable' }
 Plug 'Shougo/context_filetype.vim'
-"Plug 'tpope/surround-vim'
 
 "Searching
 Plug 'mhinz/vim-grepper', { 'on': 'Grepper' }
@@ -21,10 +20,10 @@ Plug 'junegunn/fzf', { 'on': 'FZF', 'dir': '~/.fzf', 'do': './install --all' }
 
 "Language specific
 Plug 'zchee/deoplete-jedi'
+Plug 'osyo-manga/vim-monster'
 
 "Navigation
-"Plug 'easymotion/vim-easymotion'
-"Plug 'junegunn/vim-peekaboo'
+Plug 'easymotion/vim-easymotion'
 
 "Pretty colours
 Plug 'vim-airline/vim-airline'
@@ -93,6 +92,17 @@ cmap w!! w !sudo tee % > /dev/null
 " NERDTree
 map <Leader>t :NERDTreeToggle<CR>
 
+" Easymotion (char, char-char, line, word)
+let g:EasyMotion_do_mapping = 0
+let g:EasyMotion_smartcase = 1
+nmap s <Plug>(easymotion-overwin-f)
+map  <Leader>l <Plug>(easymotion-bd-jk)
+nmap <Leader>l <Plug>(easymotion-overwin-line)
+map  <Leader>w <Plug>(easymotion-bd-w)
+nmap <Leader>w <Plug>(easymotion-overwin-w)
+map  <Leader>j <Plug>(easymotion-j)
+map  <Leader>k <Plug>(easymotion-k)
+
 " Delimitmate
 let delimitMate_expand_cr=1
 let delimitMate_expand_space=1
@@ -108,6 +118,10 @@ let g:deoplete#enable_at_startup = 1
 autocmd CompleteDone * pclose!
 set splitbelow
 
+" Monster-vim
+let g:deoplete#omni#input_patterns = get(g:,'deoplete#omni#input_patterns',{})
+let g:deoplete#omni#input_patterns.ruby = ['[^. *\t]\.\w*', '[a-zA-Z_]\w*::']
+
 " Echodoc
 let g:echodoc_enable_at_startup = 1
 
@@ -122,12 +136,7 @@ nmap <Leader>g :Goyo<CR>
 let g:goyo_width=80
 let g:goyo_heigth=85
 
-" Colourscheme
-let g:hybrid_use_Xresources = 1
-let g:enable_bold_font = 1
-
 " Airline
-set rtp+=/usr/local/lib/python2.7/dist-packages/powerline/bindings/vim
 set laststatus=2
 let g:airline_powerline_fonts=1
 let g:airline_exclude_preview=1
@@ -135,4 +144,4 @@ let g:airline_theme='base16_ocean'
 let g:airline_left_sep=''
 let g:airline_right_sep=''
 
-autocmd FileType html,javascript setlocal shiftwidth=2 tabstop=2
+autocmd FileType ruby,erb,html,javascript setlocal shiftwidth=2 tabstop=2
