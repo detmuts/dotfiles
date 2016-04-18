@@ -21,6 +21,7 @@ Plug 'junegunn/fzf', { 'on': 'FZF', 'dir': '~/.fzf', 'do': './install --all' }
 "Language specific
 Plug 'zchee/deoplete-jedi'
 Plug 'osyo-manga/vim-monster'
+Plug 'carlitux/deoplete-ternjs'
 
 "Navigation
 Plug 'easymotion/vim-easymotion'
@@ -95,7 +96,8 @@ map <Leader>t :NERDTreeToggle<CR>
 " Easymotion (char, char-char, line, word)
 let g:EasyMotion_do_mapping = 0
 let g:EasyMotion_smartcase = 1
-nmap s <Plug>(easymotion-overwin-f)
+map  <Leader>h <Plug>(easymotion-overwin-f)
+nmap <Leader>s <Plug>(easymotion-overwin-f2)
 map  <Leader>l <Plug>(easymotion-bd-jk)
 nmap <Leader>l <Plug>(easymotion-overwin-line)
 map  <Leader>w <Plug>(easymotion-bd-w)
@@ -114,12 +116,15 @@ let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 
 " Deoplete.nvim
-let g:deoplete#enable_at_startup = 1
 autocmd CompleteDone * pclose!
 set splitbelow
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#omni#input_patterns = get(g:,'deoplete#omni#input_patterns',{})
+
+" Deoplete-jedi
+let g:deoplete#sources#jedi#enable_cache = 0
 
 " Monster-vim
-let g:deoplete#omni#input_patterns = get(g:,'deoplete#omni#input_patterns',{})
 let g:deoplete#omni#input_patterns.ruby = ['[^. *\t]\.\w*', '[a-zA-Z_]\w*::']
 
 " Echodoc
@@ -144,4 +149,4 @@ let g:airline_theme='base16_ocean'
 let g:airline_left_sep=''
 let g:airline_right_sep=''
 
-autocmd FileType ruby,erb,html,javascript setlocal shiftwidth=2 tabstop=2
+autocmd FileType ruby,erb,html,javascript,css,scss setlocal shiftwidth=2 tabstop=2

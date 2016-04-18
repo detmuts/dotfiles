@@ -16,6 +16,7 @@ bspc config borderless_monocle   true
 bspc config gapless_monocle      true
 bspc config leaf_monocle         true
 bspc config focus_by_distance    true
+bspc config click_to_focus       true
 bspc config history_aware_focus  false
 
 bspc monitor -d main web code media wine chat #add more here
