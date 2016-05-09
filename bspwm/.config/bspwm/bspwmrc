@@ -1,5 +1,8 @@
 #! /bin/sh
 
+BSPWM_STATE=/tmp/bspwm-state.json
+export BSPWM_STATE
+
 sxhkd &
 
 DIR="${BASH_SOURCE%/*}"
@@ -7,42 +10,42 @@ if [[ ! -d "$DIR" ]]; then
     DIR="$PWD"
 fi
 
-bspc config border_width         2
+bspc config border_width         3
 bspc config window_gap          12
 bspc config top_padding         25
 
 bspc config split_ratio          0.50
-bspc config borderless_monocle   true
+bspc config single_monocle       true
 bspc config gapless_monocle      true
-bspc config leaf_monocle         true
-bspc config focus_by_distance    true
+bspc config borderless_monocle   true
 bspc config click_to_focus       true
-bspc config history_aware_focus  false
 
 bspc monitor -d main web code media wine chat #add more here
 
 bspc desktop ^2 --layout monocle
 bspc desktop ^4 --layout monocle
 
-bspc rule -a Gimp               desktop=^8 state=floating follow=on
-bspc rule -a Firefox            desktop=^2
-bspc rule -a qutebrowser        desktop=^2
-bspc rule -a *:libreoffice      desktop=^4
-bspc rule -a Zathura            desktop=^4
-bspc rule -a mpv                desktop=^4 follow=on
-bspc rule -a *:mpv-youtube      desktop=^2
-bspc rule -a NetBeans\ IDE\ 8.1 desktop=^3
-bspc rule -a VirtualBox         desktop=^3
+bspc rule -a Gimp               desktop='^4' state=floating follow=on
+bspc rule -a Firefox            desktop='^2'
+bspc rule -a qutebrowser        desktop='^2'
+bspc rule -a *:libreoffice      desktop='^4' state=tiled
+bspc rule -a Zathura            desktop='^4'
+bspc rule -a mpv                desktop='^4' follow=on
+bspc rule -a *:mpv-youtube      desktop='^2'
+bspc rule -a VirtualBox         desktop='^3'
+bspc rule -a NetBeans\ IDE\ 8.1 desktop='^3'
+bspc rule -a Emacs              desktop='^3' state=tiled
 
 bspc config normal_border_color         "#332d29"
 bspc config active_border_color         "#DED0BD"
 bspc config focused_border_color        "#D1D1D1"
 bspc config presel_border_color         "#9a875f"
-bspc config urgent_border_color         "#9f7155"
-bspc config focused_locked_border_color "#9a875f"
-bspc config normal_frame_opacity        0.0
-bspc config focused_frame_opacity       0.1
 
 bspc config external_rules_command $(which external_rules)
 
 panel &
+
+if [ -e "$BSPWM_STATE" ] ; then
+	bspc wm -l "$BSPWM_STATE"
+	rm "$BSPWM_STATE"
+fi

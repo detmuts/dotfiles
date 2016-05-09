@@ -1,0 +1,163 @@
+* Global functions
+** Package requirement and installation
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+  (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
+
+  (setq package-enable-at-startup nil)
+
+  (defun ensure-package-installed (&rest packages)
+    "Assure every package is installed, ask for installation if it's not.
+
+  Return a list of installed packages or nil for every skipped package."
+    (mapcar
+     (lambda (package)
+       (if (package-installed-p package)
+           nil
+         (if (y-or-n-p (format "Package %s is missing. Install it? " package))
+             (package-install package)
+           package)))
+     packages))
+
+  ;; Make sure to have downloaded archive description.
+  (or (file-exists-p package-user-dir)
+      (package-refresh-contents))
+
+  ;; Activate installed packages
+  (package-initialize)
+
+  ;; Install packages
+  (ensure-package-installed 'evil 'helm 'magit 'org 'company 'yasnippet)
+#+END_SRC
+
+** General settings
+#+BEGIN_SRC emacs-lisp
+  (global-linum-mode t)
+  (setq linum-format "%d ")
+  (column-number-mode t)
+#+END_SRC
+
+* Packages
+** Evil mode configuration
+#+BEGIN_SRC emacs-lisp
+  (require 'evil)
+  ;;(evil-mode 1) ; activates evil mode globally
+#+END_SRC
+
+** Helm configuration
+#+BEGIN_SRC emacs-lisp
+  (require 'helm-config)
+  (require 'helm-ls-git)
+  (require 'helm-descbinds)
+  (global-set-key (kbd "M-x") 'helm-M-x)
+  (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "C-x C-d") 'helm-browse-project)
+  (global-set-key (kbd "C-h i") 'helm-info-at-point)
+  (helm-mode 1)
+#+END_SRC
+
+** Magit configuration
+#+BEGIN_SRC emacs-lisp
+  (require 'magit)
+  (global-set-key (kbd "C-x g") 'magit-status)
+  (setq global-magit-file-mode t)
+#+END_SRC
+
+** Yasnippets configuration
+#+BEGIN_SRC emacs-lisp
+  (require 'yasnippet)
+  (yas-global-mode 1)
+#+END_SRC
+
+** Pos-tip configuration
+#+BEGIN_SRC emacs-lisp
+  (require 'pos-tip)
+#+END_SRC
+
+** Company auto-completion configuration
+#+BEGIN_SRC emacs-lisp
+  (require 'company)
+  (setq company-backends
+        '((company-files
+           company-keywords
+           company-capf
+           company-yasnippet
+           )
+          (company-abbrev company-dabbrev)
+          ))
+  (global-set-key (kbd "C-x /") 'company-complete)
+  (add-hook 'after-init-hook 'global-company-mode)
+  (setq company-idle-delay .3)
+
+  ;;; Company-quickhelp
+  (company-quickhelp-mode 1)
+  (setq company-quickhelp-delay .3)
+
+  ;;; Add yasnippet support for all company backends
+  ;;; bhttps://github.com/syl20bnr/spacemacs/pull/179
+  (defvar company-mode/enable-yas t
+    "Enable yasnippet for all backends.")
+
+  (defun company-mode/backend-with-yas (backend)
+    (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+        backend
+      (append (if (consp backend) backend (list backend))
+              '(:with company-yasnippet))))
+  (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+#+END_SRC
+
+*** Python completion
+#+BEGIN_SRC emacs-lisp
+  ;;;(defun my/python-mode-hook ()
+  ;;;  (add-to-list 'company-backends 'company-jedi))
+  ;;;(add-hook 'python-mode-hook 'my/python-mode-hook)
+  (add-hook 'python-mode-hook 'jedi:setup)
+  (setq jedi:get-in-function-call-delay 500)
+#+END_SRC
+
+*** Elpy configuration
+#+BEGIN_SRC emacs-lisp
+  (elpy-enable)
+  (setq elpy-rpc-backend "jedi")
+#+END_SRC
+
+** Org-mode configuration
+#+BEGIN_SRC emacs-lisp
+  (require 'org)
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cc" 'org-capture)
+  (global-set-key "\C-cb" 'org-iswitchb)
+  (setq org-log-done t)
+#+END_SRC
+
+** Avy & Ace-window
+** TODO add evil keybindings
+#+BEGIN_SRC emacs-lisp
+  (require 'avy)
+  (avy-setup-default)
+  (setq avy-keys (number-sequence ?a ?z))
+  (setq avy-all-windows 'all-frames)
+  (setq avy-case-fold-search nil)
+  ;; Keybinds
+  (global-set-key (kbd "M-g c") 'avy-goto-char)
+  (global-set-key (kbd "M-g k") 'avy-goto-char-2)
+  (global-set-key (kbd "M-g f") 'avy-goto-line)
+  (global-set-key (kbd "M-g w") 'avy-goto-word-1)
+  (global-set-key (kbd "M-g e") 'avy-goto-word-0)
+  ;; Evil-mode keybinds
+  (require 'ace-window)
+  (global-set-key (kbd "M-p") 'ace-window)
+#+END_SRC
+
+** Themes
+#+BEGIN_SRC emacs-lisp
+  ;; Treat all themes as safe
+  (setq custom-safe-themes t)
+  (setq solarized-distinct-fringe-background nil)
+  (setq solarized-use-variable-pitch nil)
+  (setq solarized-high-contrast-modeline t)
+  (setq x-underline-at-descent-line t)
+  (load-theme 'solarized-light t)
+#+END_SRC

@@ -67,7 +67,7 @@ while read -r line ; do
 			;;
 		W*)
 			# bspwm's state
-			wm=""
+			wmstate=""
 			IFS=':'
 			set -- ${line#?}
 			while [ $# -gt 0 ] ; do
@@ -88,7 +88,7 @@ while read -r line ; do
 								BG=$COLOR_FOCUSED_MONITOR_BG
 								;;
 						esac
-						wm="${wm}%{F${FG}}%{B${BG}}%{A:bspc monitor -f ${name}:} ${name} %{A}%{B-}%{F-}"
+						wmstate="${wmstate}%{F${FG}}%{B${BG}}%{A:bspc monitor -f ${name}:} ${name} %{A}%{B-}%{F-}"
 						;;
 					[fFoOuU]*)
 						case $item in
@@ -123,16 +123,16 @@ while read -r line ; do
 								BG=$COLOR_FOCUSED_URGENT_BG
 								;;
 						esac
-						wm="${wm}%{F${FG}}%{B${BG}}%{A:bspc desktop -f ${name}:}$WS_PAD ${name} $WS_PAD%{A}%{B-}%{F-}"
+						wmstate="${wmstate}%{F${FG}}%{B${BG}}%{A:bspc desktop -f ${name}:}$WS_PAD ${name} $WS_PAD%{A}%{B-}%{F-}"
 						;;
 					[LTG]*)
 						# layout, state and flags
-						wm="${wm}%{F$COLOR_STATE_FG}%{B$COLOR_STATE_BG} ${name} %{B-}%{F-}"
+						wmstate="${wmstate}%{F$COLOR_STATE_FG}%{B$COLOR_STATE_BG} ${name} %{B-}%{F-}"
 						;;
 				esac
 				shift
 			done
 			;;
 	esac
-	printf "%s\n" "%{l}${wm}%{c}${title}%{r}${net}${bat}${vol}${clock}"
+	printf "%s\n" "%{l}${wmstate}%{c}${title}%{r}${net}${bat}${vol}${clock}"
 done

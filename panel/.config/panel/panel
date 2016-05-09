@@ -1,6 +1,17 @@
 #! /bin/sh
 
-if [ $(pgrep -cx panel) -gt 1 ] ; then
+PANEL_FIFO=/tmp/panel-fifo
+PANEL_HEIGHT=24
+PANEL_FONT="NotoSans:size=11"
+PANEL_ICON_FONT="icons-12"
+PANEL_WM_NAME=bspwm_panel
+
+DIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$DIR" ]]; then
+    DIR="$PWD"
+fi
+
+if xdo id -a "$PANEL_WM_NAME" > /dev/null ; then
     printf "%s\n" "The panel is already running." >&2
     exit 1
 fi
@@ -10,14 +21,6 @@ trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
 [ -e "$PANEL_FIFO" ] && rm "$PANEL_FIFO"
 mkfifo "$PANEL_FIFO"
 
-DIR="${BASH_SOURCE%/*}"
-if [[ ! -d "$DIR" ]]; then
-    DIR="$PWD"
-fi
-
-PANEL_HEIGHT=25
-PANEL_FONT="NotoSans:size=11"
-PANEL_ICON_FONT="icons-12"
 
 bspc config top_padding $PANEL_HEIGHT
 bspc subscribe report > "$PANEL_FIFO" &
@@ -28,7 +31,7 @@ $DIR/scripts/panel_volume > "$PANEL_FIFO" &
 
 . panel_colors
 
-panel_bar < "$PANEL_FIFO" | lemonbar -a 32 -g x$PANEL_HEIGHT -f "$PANEL_FONT" -f "$PANEL_ICON_FONT" -F "$COLOR_DEFAULT_FG" -B "$COLOR_DEFAULT_BG" | sh &
+panel_bar < "$PANEL_FIFO" | lemonbar -a 32 -n "$PANEL_WM_NAME" -g x$PANEL_HEIGHT -f "$PANEL_FONT" -f "$PANEL_ICON_FONT" -F "$COLOR_DEFAULT_FG" -B "$COLOR_DEFAULT_BG" | sh &
 
 wid=$(xdo id -a "$PANEL_WM_NAME")
 tries_left=20

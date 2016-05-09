@@ -70,11 +70,18 @@ set smartcase
 nnoremap Q <nop>
 nnoremap <silent> <C-l> :nohl<CR><C-l>
 
+map <C-t>l :tabp<CR>
+map <C-t>h :tabn<CR>
+map <C-t>j :tabr<CR>
+map <C-t>k :tabl<CR>
+
+
 " Show whitespace
 set list
 set listchars=tab:\ \ ,trail:·
 
-" Colorscheme
+" Colourscheme
+set background=dark
 colorscheme hybrid_reverse
 
 " Clipboard
@@ -96,7 +103,7 @@ map <Leader>t :NERDTreeToggle<CR>
 " Easymotion (char, char-char, line, word)
 let g:EasyMotion_do_mapping = 0
 let g:EasyMotion_smartcase = 1
-map  <Leader>h <Plug>(easymotion-overwin-f)
+map  <Leader>n <Plug>(easymotion-overwin-f)
 nmap <Leader>s <Plug>(easymotion-overwin-f2)
 map  <Leader>l <Plug>(easymotion-bd-jk)
 nmap <Leader>l <Plug>(easymotion-overwin-line)
@@ -150,3 +157,36 @@ let g:airline_left_sep=''
 let g:airline_right_sep=''
 
 autocmd FileType ruby,erb,html,javascript,css,scss setlocal shiftwidth=2 tabstop=2
+
+" Functions
+"
+" Show tab number in tabline
+if exists("+showtabline")
+     function MyTabLine()
+         let s = ''
+         let t = tabpagenr()
+         let i = 1
+         while i <= tabpagenr('$')
+             let buflist = tabpagebuflist(i)
+             let winnr = tabpagewinnr(i)
+             let s .= '%' . i . 'T'
+             let s .= (i == t ? '%1*' : '%2*')
+             let s .= ' '
+             let s .= i . ')'
+             let s .= ' %*'
+             let s .= (i == t ? '%#TabLineSel#' : '%#TabLine#')
+             let file = bufname(buflist[winnr - 1])
+             let file = fnamemodify(file, ':p:t')
+             if file == ''
+                 let file = '[No Name]'
+             endif
+             let s .= file
+             let i = i + 1
+         endwhile
+         let s .= '%T %#TabLineFill#%='
+         let s .= (tabpagenr('$') > 1 ? '%999XX' : 'X')
+         return s
+     endfunction
+     set stal=2
+     set tabline=%!MyTabLine()
+endif

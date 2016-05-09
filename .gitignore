@@ -1,4 +1,6 @@
 /qutebrowser/.config/qutebrowser/*
 !/qutebrowser/.config/qutebrowser/keys.conf
 !/qutebrowser/.config/qutebrowser/qutebrowser.conf
+/emacs/.emacs.d/*\~
+/emacs/.emacs.d/settings.el
 !/.gitignore

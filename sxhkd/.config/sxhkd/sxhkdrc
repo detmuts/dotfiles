@@ -11,7 +11,7 @@ super + shift + Return
 
 # program launcher
 super + space
-	j4-dmenu-desktop --dmenu="dmenu -i -l 3 -p '\\_' -nb '#363B45' -nf '#8C8C8C' -sf '#FFFFFF' -sb '#363B45' -fn 'Noto Sans-11'" --term='urxvt'
+	j4-dmenu-desktop --dmenu="dmenu -i -l 3 -p '\\_' -nb '#363B45' -nf '#8C8C8C' -sf '#FFFFFF' -sb '#363B45' -fn 'Noto Sans-12'" --term='urxvt'
 
 # lockscreen
 super + shift + b
@@ -29,9 +29,10 @@ super + shift + p
 # bspwm hotkeys
 #
 
-# quit bspwm normally
-super + alt + Escape
-	bspc quit
+# refresh or quit bspwm
+super + alt + {_,shift + }Escape
+	{bspc wm -d > "$BSPWM_STATE" && bspc quit, \
+	 bspc quit 1}
 
 # close and kill
 super + {_,shift + }q
@@ -77,8 +78,10 @@ super + {p,b,comma,period}
 	bspc node -f @{parent,brother,first,second}
 
 # focus the next/previous node
-super + {_,shift + }Tab
-	bspc node -f {next,prev}
+super + Tab
+	bspc node -f next.local
+super + shift + Tab
+    bspc node -f prev.local
 
 # focus the next/previous desktop
 super + alt + {Left,Right}

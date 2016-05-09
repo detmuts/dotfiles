@@ -1,6 +1,4 @@
 ! General settings
-*.font:	xft:Inconsolata:size=10, \
-        xft:Icons:Regular:size=10
 
 ! Xft settings
 Xft.dpi: 96
@@ -43,10 +41,10 @@ Xft.hintstyle: hintslight
 ! URxvt settings
 URxvt.scrollBar: false
 URxvt.font: xft:Anonymous Pro for Powerline:pixelsize=17, \
-            xft:DejaVu Sans Mono for Powerline:size=11, \
-            xft:Icons:size=9
+            xft:DejaVu Sans Mono for Powerline:size=11
+!            xft:Icons:size=9
 
 URxvt.boldFont: xft:Anonymous Pro for Powerline:bold:pixelsize=17, \
-            xft:DejaVu Sans Mono for Powerline:bold:size=11, \
-            xft:Icons:size=9
+            xft:DejaVu Sans Mono for Powerline:bold:size=11
+!            xft:Icons:size=9
 ! URxvt.letterSpace: -1
