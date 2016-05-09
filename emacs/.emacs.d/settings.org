@@ -28,14 +28,26 @@
   (package-initialize)
 
   ;; Install packages
-  (ensure-package-installed 'evil 'helm 'magit 'org 'company 'yasnippet)
+  (ensure-package-installed 'evil 
+                            'helm  'helm-gtags 'helm-projectile
+                            'magit 
+			    'org 
+			    'company 'company-c-headers
+			    'yasnippet
+			    'pos-tip
+			    'function-args
+			    'avy
+			    'ace-window)
 #+END_SRC
 
 ** General settings
 #+BEGIN_SRC emacs-lisp
+  ;; Enable line numbers
   (global-linum-mode t)
-  (setq linum-format "%d ")
+  (setq linum-format "%6d ")
   (column-number-mode t)
+  ;; Automatically insert closing parens/brackets/...
+  (electric-pair-mode 1)
 #+END_SRC
 
 * Packages
@@ -46,6 +58,7 @@
 #+END_SRC
 
 ** Helm configuration
+*** General setup
 #+BEGIN_SRC emacs-lisp
   (require 'helm-config)
   (require 'helm-ls-git)
@@ -56,7 +69,15 @@
   (global-set-key (kbd "C-h i") 'helm-info-at-point)
   (helm-mode 1)
 #+END_SRC
-
+*** Helm-projectile
+#+BEGIN_SRC emacs-lisp
+  (require 'projectile)
+  (projectile-global-mode)
+  (setq projectile-completion-system 'helm)
+  (require 'helm-projectile)
+  (helm-projectile-on)
+  ;;(global-set-key (kbd "C-c p h") 'helm-projectile)
+#+END_SRC
 ** Magit configuration
 #+BEGIN_SRC emacs-lisp
   (require 'magit)
@@ -75,7 +96,7 @@
   (require 'pos-tip)
 #+END_SRC
 
-** Company auto-completion configuration
+** Company Auto-completion configuration
 #+BEGIN_SRC emacs-lisp
   (require 'company)
   (setq company-backends
@@ -112,14 +133,69 @@
   ;;;(defun my/python-mode-hook ()
   ;;;  (add-to-list 'company-backends 'company-jedi))
   ;;;(add-hook 'python-mode-hook 'my/python-mode-hook)
+  (setq python-shell-interpreter "/usr/bin/ipython3")
   (add-hook 'python-mode-hook 'jedi:setup)
+  (setq jedi:complete-on-dot t)
   (setq jedi:get-in-function-call-delay 500)
 #+END_SRC
 
 *** Elpy configuration
 #+BEGIN_SRC emacs-lisp
+  (require 'elpy)
+  ;; Elpy uses company for completion, so we only have to enable it
   (elpy-enable)
+  ;; Use Jedi as a backend for elpy (personal preference)
   (setq elpy-rpc-backend "jedi")
+#+END_SRC
+
+*** C/C++ configuration
+**** Helm-gtags setup
+#+BEGIN_SRC emacs-lisp
+  (setq
+   helm-gtags-ignore-case t
+   helm-gtags-auto-update t
+   helm-gtags-use-input-at-cursor t
+   helm-gtags-pulse-at-cursor t
+   helm-gtags-prefix-key "\C-cg"
+   helm-gtags-suggested-key-mapping t
+   )
+
+  (require 'helm-gtags)
+  ;; Enable helm-gtags-mode
+  (add-hook 'dired-mode-hook 'helm-gtags-mode)
+  (add-hook 'eshell-mode-hook 'helm-gtags-mode)
+  (add-hook 'c-mode-hook 'helm-gtags-mode)
+  (add-hook 'c++-mode-hook 'helm-gtags-mode)
+  (add-hook 'asm-mode-hook 'helm-gtags-mode)
+
+  (define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-tags-in-this-function)
+  (define-key helm-gtags-mode-map (kbd "C-j") 'helm-gtags-select)
+  (define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
+  (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
+  (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
+  (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
+#+END_SRC
+**** Function-args setup
+#+BEGIN_SRC emacs-lisp
+  (require 'function-args)
+  (fa-config-default)
+  ;; Put C++ mode as default for header files
+  (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+  ;; Enable case-insensitive searching for semantic
+  (set-default 'semantic-case-fold t)
+#+END_SRC
+**** Company-clang setup
+#+BEGIN_SRC emacs-lisp
+  ;; Semantic is first-in-order for completion
+  ;; We remove it so company uses clang as back-end
+  (setq company-backends (delete 'company-semantic company-backends))
+#+END_SRC
+**** Company-c-headers setup
+#+BEGIN_SRC emacs-lisp
+  (require 'company-c-headers)
+  (add-to-list 'company-backends 'company-c-headers)
+  ;; Add paths to C++ headers
+  (add-to-list 'company-c-headers-path-system "/usr/include/c++/6.1.1/")
 #+END_SRC
 
 ** Org-mode configuration
@@ -133,7 +209,7 @@
 #+END_SRC
 
 ** Avy & Ace-window
-** TODO add evil keybindings
+*** TODO add evil keybindings
 #+BEGIN_SRC emacs-lisp
   (require 'avy)
   (avy-setup-default)
@@ -141,14 +217,14 @@
   (setq avy-all-windows 'all-frames)
   (setq avy-case-fold-search nil)
   ;; Keybinds
-  (global-set-key (kbd "M-g c") 'avy-goto-char)
-  (global-set-key (kbd "M-g k") 'avy-goto-char-2)
-  (global-set-key (kbd "M-g f") 'avy-goto-line)
-  (global-set-key (kbd "M-g w") 'avy-goto-word-1)
-  (global-set-key (kbd "M-g e") 'avy-goto-word-0)
+  (global-set-key (kbd "M-s c") 'avy-goto-char)
+  (global-set-key (kbd "M-s s") 'avy-goto-char-2)
+  (global-set-key (kbd "M-s l") 'avy-goto-line)
+  (global-set-key (kbd "M-s e") 'avy-goto-word-0)
+  (global-set-key (kbd "M-s w") 'avy-goto-word-1)
   ;; Evil-mode keybinds
   (require 'ace-window)
-  (global-set-key (kbd "M-p") 'ace-window)
+  (global-set-key (kbd "M-n") 'ace-window)
 #+END_SRC
 
 ** Themes
