@@ -32,7 +32,7 @@
                             'helm  'helm-gtags 'helm-projectile
                             'magit 
 			    'org 
-			    'company 'company-c-headers
+			    'company 'company-c-headers 'company-tern
 			    'yasnippet
 			    'pos-tip
 			    'function-args
@@ -48,25 +48,48 @@
   (column-number-mode t)
   ;; Automatically insert closing parens/brackets/...
   (electric-pair-mode 1)
+  ;; Show trailing whitespace
+  (add-hook 'prog-mode-hook
+            (lambda()
+              (interactive) (setq show-trailing-whitespace 1)))
+#+END_SRC
+
+*** Aliases
+#+BEGIN_SRC emacs-lisp
+  ;; Align-regexp
+  (defalias 'ar #'align-regexp)
+  ;; List-packages
+  (defalias 'lp #'list-packages)
 #+END_SRC
 
 * Packages
 ** Evil mode configuration
 #+BEGIN_SRC emacs-lisp
   (require 'evil)
-  ;;(evil-mode 1) ; activates evil mode globally
+  (require 'evil-surround)
+  (require 'evil-nerd-commenter)
+  ;; Activates evil mode globally
+  (evil-mode 1)
+  ;; Same for evil-surround-change
+  (evil-surround-mode 1)
+  ;; Activate evil-nerd-commenter
+  (evilnc-default-hotkeys)
+  ;; Evil mode movement keybindings
+  (define-key evil-normal-state-map (kbd "L") 'evil-end-of-line)
+  (define-key evil-visual-state-map (kbd "L") 'evil-end-of-line)
+  (define-key evil-normal-state-map (kbd "H") 'evil-beginning-of-line)
+  (define-key evil-visual-state-map (kbd "H") 'evil-beginning-of-line)
 #+END_SRC
-
 ** Helm configuration
 *** General setup
 #+BEGIN_SRC emacs-lisp
   (require 'helm-config)
   (require 'helm-ls-git)
   (require 'helm-descbinds)
-  (global-set-key (kbd "M-x") 'helm-M-x)
-  (global-set-key (kbd "C-x C-f") 'helm-find-files)
-  (global-set-key (kbd "C-x C-d") 'helm-browse-project)
-  (global-set-key (kbd "C-h i") 'helm-info-at-point)
+  (global-set-key (kbd "M-x")           'helm-M-x)
+  (global-set-key (kbd "C-x C-f")       'helm-find-files)
+  (global-set-key (kbd "C-x C-d")       'helm-browse-project)
+  (global-set-key (kbd "C-h i")         'helm-info-at-point)
   (helm-mode 1)
 #+END_SRC
 *** Helm-projectile
@@ -76,8 +99,8 @@
   (setq projectile-completion-system 'helm)
   (require 'helm-projectile)
   (helm-projectile-on)
-  ;;(global-set-key (kbd "C-c p h") 'helm-projectile)
 #+END_SRC
+
 ** Magit configuration
 #+BEGIN_SRC emacs-lisp
   (require 'magit)
@@ -96,9 +119,12 @@
   (require 'pos-tip)
 #+END_SRC
 
-** Company Auto-completion configuration
+** Company configuration
 #+BEGIN_SRC emacs-lisp
   (require 'company)
+  ;; Initialize company mode globally
+  (add-hook 'after-init-hook 'global-company-mode)
+  ;; Set global company backends
   (setq company-backends
         '((company-files
            company-keywords
@@ -107,19 +133,17 @@
            )
           (company-abbrev company-dabbrev)
           ))
-  (global-set-key (kbd "C-x /") 'company-complete)
-  (add-hook 'after-init-hook 'global-company-mode)
+  (global-set-key (kbd "M-/") 'company-complete)
   (setq company-idle-delay .3)
 
-  ;;; Company-quickhelp
+  ;; Company-quickhelp
   (company-quickhelp-mode 1)
   (setq company-quickhelp-delay .3)
 
-  ;;; Add yasnippet support for all company backends
-  ;;; bhttps://github.com/syl20bnr/spacemacs/pull/179
+  ;; Add yasnippet support for all company backends
+  ;; https://github.com/syl20bnr/spacemacs/pull/179
   (defvar company-mode/enable-yas t
     "Enable yasnippet for all backends.")
-
   (defun company-mode/backend-with-yas (backend)
     (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
         backend
@@ -130,15 +154,11 @@
 
 *** Python completion
 #+BEGIN_SRC emacs-lisp
-  ;;;(defun my/python-mode-hook ()
-  ;;;  (add-to-list 'company-backends 'company-jedi))
-  ;;;(add-hook 'python-mode-hook 'my/python-mode-hook)
   (setq python-shell-interpreter "/usr/bin/ipython3")
   (add-hook 'python-mode-hook 'jedi:setup)
   (setq jedi:complete-on-dot t)
   (setq jedi:get-in-function-call-delay 500)
 #+END_SRC
-
 *** Elpy configuration
 #+BEGIN_SRC emacs-lisp
   (require 'elpy)
@@ -147,9 +167,47 @@
   ;; Use Jedi as a backend for elpy (personal preference)
   (setq elpy-rpc-backend "jedi")
 #+END_SRC
-
+*** Web-mode configuration
+#+BEGIN_SRC emacs-lisp
+  (require 'company-web)
+  (defun my/web-mode-hook ()
+    (add-to-list 'company-backends '(company-tern company-web-html)))
+  (add-hook 'web-mode-hook 'my/web-mode-hook)
+  ;; Enable JavaScript completion between <script>...</script> tags
+  (defadvice company-tern (before web-mode-set-up-ac-sources activate)
+    "Set `tern-mode' based on current language before running company-tern."
+    (message "advice")
+    (if (equal major-mode 'web-mode)
+        (let ((web-mode-cur-language
+               (web-mode-language-at-pos)))
+          (if (or (string= web-mode-cur-language "javascript")
+                  (string= web-mode-cur-language "jsx")
+                  )
+              (unless tern-mode (tern-mode))
+            (if tern-mode (tern-mode -1))))))
+#+END_SRC
+*** Emmet-mode configuration
+#+BEGIN_SRC emacs-lisp
+  (require 'emmet-mode)
+  (add-hook 'html-mode-hook 'emmet-mode)
+  (add-hook 'css-mode-hook 'emmet-mode)
+  (add-hook 'scss-mode-hook 'emmet-mode)
+#+END_SRC
+*** SCSS-mode configuration
+#+BEGIN_SRC emacs-lisp
+  (require 'scss-mode)
+  (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
+  (setq scss-compile-at-save nil)
+#+END_SRC
+*** Javascript configuration
+#+BEGIN_SRC emacs-lisp
+  (require 'company-tern)
+  (defun my/js-mode-hook ()
+    (add-to-list 'company-backends 'company-tern))
+  (add-hook 'js-mode-hook 'my/js-mode-hook)
+#+END_SRC
 *** C/C++ configuration
-**** Helm-gtags setup
+Helm-gtags setup
 #+BEGIN_SRC emacs-lisp
   (setq
    helm-gtags-ignore-case t
@@ -168,14 +226,14 @@
   (add-hook 'c++-mode-hook 'helm-gtags-mode)
   (add-hook 'asm-mode-hook 'helm-gtags-mode)
 
-  (define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-tags-in-this-function)
-  (define-key helm-gtags-mode-map (kbd "C-j") 'helm-gtags-select)
-  (define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
-  (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
-  (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
-  (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history)
+  (define-key helm-gtags-mode-map (kbd "C-c g a")	'helm-gtags-tags-in-this-function)
+  (define-key helm-gtags-mode-map (kbd "C-j")		'helm-gtags-select)
+  (define-key helm-gtags-mode-map (kbd "M-.")		'helm-gtags-dwim)
+  (define-key helm-gtags-mode-map (kbd "M-,")		'helm-gtags-pop-stack)
+  (define-key helm-gtags-mode-map (kbd "C-c <")		'helm-gtags-previous-history)
+  (define-key helm-gtags-mode-map (kbd "C-c >")		'helm-gtags-next-history)
 #+END_SRC
-**** Function-args setup
+Function-args setup
 #+BEGIN_SRC emacs-lisp
   (require 'function-args)
   (fa-config-default)
@@ -184,13 +242,14 @@
   ;; Enable case-insensitive searching for semantic
   (set-default 'semantic-case-fold t)
 #+END_SRC
-**** Company-clang setup
+Company-clang setup
 #+BEGIN_SRC emacs-lisp
   ;; Semantic is first-in-order for completion
   ;; We remove it so company uses clang as back-end
   (setq company-backends (delete 'company-semantic company-backends))
+  (setq c-default-style "linux")
 #+END_SRC
-**** Company-c-headers setup
+Company-c-headers setup
 #+BEGIN_SRC emacs-lisp
   (require 'company-c-headers)
   (add-to-list 'company-backends 'company-c-headers)
@@ -209,7 +268,6 @@
 #+END_SRC
 
 ** Avy & Ace-window
-*** TODO add evil keybindings
 #+BEGIN_SRC emacs-lisp
   (require 'avy)
   (avy-setup-default)
@@ -223,8 +281,16 @@
   (global-set-key (kbd "M-s e") 'avy-goto-word-0)
   (global-set-key (kbd "M-s w") 'avy-goto-word-1)
   ;; Evil-mode keybinds
+  (define-key evil-normal-state-map (kbd "s") 'avy-goto-char-2)  
+  (define-key evil-motion-state-map (kbd "z") 'avy-goto-char-2)
+  (define-key evil-visual-state-map (kbd "z") 'avy-goto-char-2)
   (require 'ace-window)
   (global-set-key (kbd "M-n") 'ace-window)
+#+END_SRC
+
+** Smart-mode-line
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'after-init-hook 'sml/setup)
 #+END_SRC
 
 ** Themes
