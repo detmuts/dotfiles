@@ -79,6 +79,32 @@
   (define-key evil-visual-state-map (kbd "L") 'evil-end-of-line)
   (define-key evil-normal-state-map (kbd "H") 'evil-beginning-of-line)
   (define-key evil-visual-state-map (kbd "H") 'evil-beginning-of-line)
+  ;; General bindings
+  (define-key evil-normal-state-map (kbd "; k") 'kill-buffer)
+  (define-key evil-visual-state-map (kbd "; k") 'kill-buffer)
+  ;; Evil mode plugin bindings
+  (define-key evil-normal-state-map (kbd "; g") 'magit-status)
+  (define-key evil-visual-state-map (kbd "; g") 'magit-status)
+  (define-key evil-normal-state-map (kbd "; b") 'helm-buffers-list)
+  (define-key evil-visual-state-map (kbd "; b") 'helm-buffers-list)
+  (define-key evil-normal-state-map (kbd "; f") 'helm-find-files)
+  (define-key evil-visual-state-map (kbd "; f") 'helm-find-files)
+  (define-key evil-normal-state-map (kbd "; w f") 'find-file-other-window)
+  (define-key evil-visual-state-map (kbd "; w f") 'find-file-other-window)
+  (define-key evil-insert-state-map (kbd "C-n") 'company-select-next)
+  (define-key evil-insert-state-map (kbd "C-p") 'company-select-previous)
+  (define-key evil-normal-state-map (kbd "t") 'org-todo)
+  (define-key evil-visual-state-map (kbd "t") 'org-todo)
+  (define-key evil-normal-state-map (kbd "T") 'org-insert-todo-heading)
+  (define-key evil-visual-state-map (kbd "T") 'org-insert-todo-heading)
+  (define-key evil-normal-state-map (kbd "; a") 'org-agenda)
+  (define-key evil-visual-state-map (kbd "; a") 'org-agenda)
+  (define-key evil-normal-state-map (kbd "; t") 'org-show-todo-tree)
+  (define-key evil-visual-state-map (kbd "; t") 'org-show-todo-tree)
+  (define-key evil-normal-state-map (kbd "; c") 'org-archive-subtree)
+  (define-key evil-visual-state-map (kbd "; c") 'org-archive-subtree)
+  (define-key evil-normal-state-map (kbd "; l") 'org-store-link)
+  (define-key evil-visual-state-map (kbd "; l") 'org-store-link)
 #+END_SRC
 ** Helm configuration
 *** General setup
@@ -89,6 +115,7 @@
   (global-set-key (kbd "M-x")           'helm-M-x)
   (global-set-key (kbd "C-x C-f")       'helm-find-files)
   (global-set-key (kbd "C-x C-d")       'helm-browse-project)
+  (global-set-key (kbd "C-x C-b")       'helm-buffers-list)
   (global-set-key (kbd "C-h i")         'helm-info-at-point)
   (helm-mode 1)
 #+END_SRC
