@@ -28,7 +28,7 @@
   (package-initialize)
 
   ;; Install packages
-  (ensure-package-installed 'evil 
+  (ensure-package-installed 'evil
                             'helm  'helm-gtags 'helm-projectile
                             'magit 
 			    'org 
@@ -94,6 +94,9 @@
   (define-key evil-visual-state-map (kbd "; K") 'kill-some-buffers)
   (define-key evil-normal-state-map (kbd "; w f") 'find-file-other-window)
   (define-key evil-visual-state-map (kbd "; w f") 'find-file-other-window)
+  (define-key evil-normal-state-map (kbd "; w c") 'clone-indirect-buffer-other-window)
+  (define-key evil-visual-state-map (kbd "; w c") 'clone-indirect-buffer-other-window)
+  
   ;; Evil mode plugin bindings
   (define-key evil-normal-state-map (kbd "; g") 'magit-status)
   (define-key evil-visual-state-map (kbd "; g") 'magit-status)
@@ -125,6 +128,10 @@
   (define-key evil-visual-state-map (kbd "; l") 'org-store-link)
   (define-key evil-insert-state-map (kbd "C-n") 'company-select-next)
   (define-key evil-insert-state-map (kbd "C-p") 'company-select-previous)
+  (define-key evil-normal-state-map (kbd "; ; w") 'ace-window)
+  (define-key evil-visual-state-map (kbd "; ; w") 'ace-window)
+  (define-key evil-normal-state-map (kbd "; x") 'helm-M-x)
+  (define-key evil-visual-state-map (kbd "; x") 'helm-M-x)
 #+END_SRC
 ** Helm configuration
 *** General setup
@@ -385,7 +392,7 @@
   ;; Treat all themes as safe
   (setq custom-safe-themes t)
   (setq solarized-distinct-fringe-background nil)
-  (setq solarized-use-variable-pitch nil)
+  (setq solarized-use-variable-pitch nil) ;
   (setq solarized-high-contrast-modeline t)
   (setq x-underline-at-descent-line t)
   (load-theme 'solarized-light t)
