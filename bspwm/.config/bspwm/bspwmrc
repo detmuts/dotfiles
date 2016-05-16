@@ -3,6 +3,11 @@
 BSPWM_STATE=/tmp/bspwm-state.json
 export BSPWM_STATE
 
+if [ -e "$BSPWM_STATE" ] ; then
+	bspc wm -l "$BSPWM_STATE"
+	rm "$BSPWM_STATE"
+fi
+
 sxhkd &
 
 DIR="${BASH_SOURCE%/*}"
@@ -44,8 +49,3 @@ bspc config presel_border_color         "#9a875f"
 bspc config external_rules_command $(which external_rules)
 
 panel &
-
-if [ -e "$BSPWM_STATE" ] ; then
-	bspc wm -l "$BSPWM_STATE"
-	rm "$BSPWM_STATE"
-fi

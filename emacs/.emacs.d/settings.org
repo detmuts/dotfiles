@@ -1,47 +1,25 @@
-* Global functions
-** Package requirement and installation
+* Global settings
+*Add package archives*
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
   (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
 
   (setq package-enable-at-startup nil)
-
-  (defun ensure-package-installed (&rest packages)
-    "Assure every package is installed, ask for installation if it's not.
-
-    Return a list of installed packages or nil for every skipped package."
-	(mapcar
-	(lambda (package)
-	    (if (package-installed-p package)
-	      nil
-	    (if (y-or-n-p (format "Package %s is missing. Install it? " package))
-             (package-install package)
-           package)))
-     packages))
-
-  ;; Make sure to have downloaded archive description.
-  (or (file-exists-p package-user-dir)
-      (package-refresh-contents))
-
-  ;; Activate installed packages
-  (package-initialize)
-
-  ;; Install packages
-  (ensure-package-installed 'evil
-                            'helm  'helm-gtags 'helm-projectile
-                            'magit 
-			    'org 
-			    'company 'company-c-headers 'company-tern
-			    'yasnippet
-			    'pos-tip
-			    'function-args
-			    'avy
-			    'ace-window)
 #+END_SRC
 
-** General settings
+*Initialize use-package*
 #+BEGIN_SRC emacs-lisp
+  (eval-when-compile
+    (require 'cl-lib)
+    (require 'use-package))
+  (require 'diminish)
+  (require 'bind-key)
+#+END_SRC
+
+*Basic settings*
+#+BEGIN_SRC emacs-lisp
+  (fset 'yes-or-no-p 'y-or-n-p)
   ;; Enable line numbers
   (global-linum-mode t)
   (setq linum-format "%6d ")
@@ -54,7 +32,7 @@
               (interactive) (setq show-trailing-whitespace 1)))
   ;; Set indentation
   (setq css-indent-offset 2)
-  (defun space-indent-hook ()             ;
+  (defun space-indent-hook ()             
           (setq c-basic-offset 2)
           (setq indent-tabs-mode nil)
 	  (setq evil-shift-width 2))
@@ -62,338 +40,338 @@
   (add-hook 'scss-mode-hook 'space-indent-hook)
 #+END_SRC
 
-*** Aliases
+* Package settings
+** Evil Mode
 #+BEGIN_SRC emacs-lisp
-  ;; Align-regexp
-  (defalias 'ar #'align-regexp)
-  ;; List-packages
-  (defalias 'lp #'list-packages)
+    (use-package evil
+      :ensure t
+      :init
+      (progn
+        (evil-mode 1))
+      :config
+      ()
+      :bind (:map evil-normal-state-map
+             ;; Movement
+             ("L" . evil-end-of-line)
+             ("H" . evil-beginning-of-line)
+             ;; Buffer/file management
+             ("; k" . kill-buffer)
+             ("; K" . kill-some-buffers)
+             ("; c" . clone-indirect-buffer)
+             ("; w c" . clone-indirect-buffer-other-window)
+             ("; w f" . find-file-other-window)
+             ;; Window management
+             ("; 0" . delete-window)
+             ("; 1" . delete-other-windows)
+             ("; 2" . split-window-below)
+             ("; 3" . split-window-right)
+             :map evil-visual-state-map
+             ("L" . evil-end-of-line)
+             ("H" . evil-beginning-of-line)))
+    (use-package evil-surround
+      :ensure t
+      :defer t
+      :init
+      (global-evil-surround-mode 1))
+    (use-package evil-nerd-commenter
+      :ensure t
+      :defer t
+      :init
+      (evilnc-default-hotkeys))
 #+END_SRC
 
-* Packages
-** Evil mode configuration
+** Helm
+*** General setup
+*initial helm configuration*
 #+BEGIN_SRC emacs-lisp
-  (require 'evil)
-  (require 'evil-surround)
-  (require 'evil-nerd-commenter)
-  ;; Activates evil mode globally
-  (evil-mode 1)
-  ;; Same for evil-surround-change
-  (global-evil-surround-mode 1)
-  ;; Activate evil-nerd-commenter
-  (evilnc-default-hotkeys)
-  ;; Evil mode movement keybindings
-  (define-key evil-normal-state-map (kbd "L") 'evil-end-of-line)
-  (define-key evil-visual-state-map (kbd "L") 'evil-end-of-line)
-  (define-key evil-normal-state-map (kbd "H") 'evil-beginning-of-line)
-  (define-key evil-visual-state-map (kbd "H") 'evil-beginning-of-line)
-  ;; General bindings
-  (define-key evil-normal-state-map (kbd "; k") 'kill-buffer)
-  (define-key evil-visual-state-map (kbd "; k") 'kill-buffer)
-  (define-key evil-normal-state-map (kbd "; K") 'kill-some-buffers)
-  (define-key evil-visual-state-map (kbd "; K") 'kill-some-buffers)
-  (define-key evil-normal-state-map (kbd "; w f") 'find-file-other-window)
-  (define-key evil-visual-state-map (kbd "; w f") 'find-file-other-window)
-  (define-key evil-normal-state-map (kbd "; w c") 'clone-indirect-buffer-other-window)
-  (define-key evil-visual-state-map (kbd "; w c") 'clone-indirect-buffer-other-window)
-  
-  ;; Evil mode plugin bindings
-  (define-key evil-normal-state-map (kbd "; g") 'magit-status)
-  (define-key evil-visual-state-map (kbd "; g") 'magit-status)
-  (define-key evil-normal-state-map (kbd "; b") 'helm-buffers-list)
-  (define-key evil-visual-state-map (kbd "; b") 'helm-buffers-list)
-  (define-key evil-normal-state-map (kbd "; d") 'helm-browse-project)
-  (define-key evil-visual-state-map (kbd "; d") 'helm-browse-project)
-  (define-key evil-normal-state-map (kbd "; f") 'helm-find-files)
-  (define-key evil-visual-state-map (kbd "; f") 'helm-find-files)
-  (define-key evil-normal-state-map (kbd "; p h") 'helm-projectile)
-  (define-key evil-visual-state-map (kbd "; p h") 'helm-projectile)
-  (define-key evil-normal-state-map (kbd "; p f") 'helm-projectile-find-file)
-  (define-key evil-visual-state-map (kbd "; p f") 'helm-projectile-find-file)
-  (define-key evil-normal-state-map (kbd "; p d") 'helm-projectile-find-dir)
-  (define-key evil-visual-state-map (kbd "; p d") 'helm-projectile-find-dir)
-  (define-key evil-normal-state-map (kbd "; p b") 'helm-projectile-switch-to-buffer)
-  (define-key evil-visual-state-map (kbd "; p b") 'helm-projectile-switch-to-buffer)
-  (define-key evil-normal-state-map (kbd "t") 'org-todo)
-  (define-key evil-visual-state-map (kbd "t") 'org-todo)
-  (define-key evil-normal-state-map (kbd "T") 'org-insert-todo-heading)
-  (define-key evil-visual-state-map (kbd "T") 'org-insert-todo-heading)
-  (define-key evil-normal-state-map (kbd "; a") 'org-agenda)
-  (define-key evil-visual-state-map (kbd "; a") 'org-agenda)
-  (define-key evil-normal-state-map (kbd "; t") 'org-show-todo-tree)
-  (define-key evil-visual-state-map (kbd "; t") 'org-show-todo-tree)
-  (define-key evil-normal-state-map (kbd "; c") 'org-archive-subtree)
-  (define-key evil-visual-state-map (kbd "; c") 'org-archive-subtree)
-  (define-key evil-normal-state-map (kbd "; l") 'org-store-link)
-  (define-key evil-visual-state-map (kbd "; l") 'org-store-link)
-  (define-key evil-insert-state-map (kbd "C-n") 'company-select-next)
-  (define-key evil-insert-state-map (kbd "C-p") 'company-select-previous)
-  (define-key evil-normal-state-map (kbd "; ; w") 'ace-window)
-  (define-key evil-visual-state-map (kbd "; ; w") 'ace-window)
-  (define-key evil-normal-state-map (kbd "; x") 'helm-M-x)
-  (define-key evil-visual-state-map (kbd "; x") 'helm-M-x)
+  (use-package helm
+    :ensure t
+    :init
+    (progn
+      (require 'helm-config)
+      (setq helm-split-window-in-side-p t
+            helm-move-to-line-cycle-in-source t)
+      (helm-mode 1))
+    :config
+    ()
+    :bind (("M-x" . helm-M-x)
+           ("M-y" . helm-show-kill-ring)
+           ("C-h i" . helm-info-at-point)
+           ("C-x C-f" . helm-find-files)
+           ("C-x C-d" . helm-browse-project)
+           ("C-x C-b" . helm-buffers-list)
+           :map helm-map
+           ("<tab>" . helm-execute-persistent-action)
+           ("C-z" . helm-select-action)
+           :map evil-normal-state-map
+           ("; b" . helm-buffers-list)
+           ("; d" . helm-browse-project)
+           ("; f" . helm-find-files)
+           ("; x" . helm-M-x)
+           ("; y" . helm-show-kill-ring)))
+
+  (use-package helm-ag
+    :ensure t
+    :defer t)
+
+  (use-package helm-ls-git
+    :ensure t
+    :defer t)
+
+  (use-package helm-descbinds
+    :ensure t
+    :defer t)
 #+END_SRC
-** Helm configuration
+
+*** Helm-Projectile
+*helm-projectile configuration*
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :ensure t
+    :init
+    (progn
+      (setq projectile-completion-system 'helm)
+      (projectile-global-mode)))
+
+  (use-package helm-projectile
+    :ensure t
+    :defer t
+    :init
+    (progn
+      (helm-projectile-on))
+    :bind (:map evil-normal-state-map
+           ("; p h" . helm-projectile)
+           ("; p f" . helm-projectile-find-file)
+           ("; p d" . helm-projectile-find-dir)
+           ("; p b" . helm-projectile-switch-to-buffer)))
+#+END_SRC
+
+** Magit
+*General setup*
+#+BEGIN_SRC emacs-lisp
+    (use-package magit
+      :ensure t
+      :init
+      (progn
+        (setq global-magit-file-mode t
+              magit-repository-directories-depth 1))
+      :config
+      ;; Populate magit with projectile's git repository cache
+      (eval-after-load "projectile"
+        '(progn (setq magit-repository-directories
+                      (mapcar (lambda (dir)
+                                (substring dir 0 -1))
+                              (remove-if-not (lambda (project)
+                                               (file-directory-p (concat project "/.git/")))
+                                             (projectile-relevant-known-projects))))))
+      :bind (("C-x g" . magit-status)
+             :map evil-normal-state-map
+             ("; g" . magit-status)))
+#+END_SRC
+
+** Company auto-completion
 *** General setup
 #+BEGIN_SRC emacs-lisp
-  (require 'helm-config)
-  (require 'helm-ag)
-  (require 'helm-ls-git)
-  (require 'helm-descbinds)
-  (global-set-key (kbd "M-x")           'helm-M-x)
-  (global-set-key (kbd "C-x C-f")       'helm-find-files)
-  (global-set-key (kbd "C-x C-d")       'helm-browse-project)
-  (global-set-key (kbd "C-x C-b")       'helm-buffers-list)
-  (global-set-key (kbd "C-h i")         'helm-info-at-point)
-  (define-key helm-map (kbd "<tab>")	'helm-execute-persistent-action)
-  (define-key helm-map (kbd "C-z")	'helm-select-action)
-  (setq helm-split-window-in-side-p t)
-  (helm-mode 1)
-#+END_SRC
-*** Helm-projectile
-#+BEGIN_SRC emacs-lisp
-  (require 'projectile)
-  (projectile-global-mode)
-  (setq projectile-completion-system 'helm)
-  (require 'helm-projectile)
-  (helm-projectile-on)
-#+END_SRC
+  (use-package company
+    :ensure t
+    :init
+    (progn
+      (setq company-backends
+            '((company-files company-keywords company-capf company-yasnippet)
+              (company-abbrev company-dabbrev company-dabbrev-code))
+            company-idle-delay .3)
+      (add-hook 'after-init-hook 'global-company-mode))
+    :bind (("M-/" . company-complete)
+           :map evil-insert-state-map
+           ("C-n" . company-select-next)
+           ("C-p" . company-select-previous)))
 
-** Magit configuration
-#+BEGIN_SRC emacs-lisp
-  (require 'magit)
-  (global-set-key (kbd "C-x g") 'magit-status)
-  (setq global-magit-file-mode t)
-  ;; Projectile remembers git projects, so let's use it
-  ;; to populate magit-repository-directories
-  (eval-after-load "projectile"
-    '(progn (setq magit-repository-directories
-                  (mapcar (lambda (dir)
-                            (substring dir 0 -1))
-                          (remove-if-not (lambda (project)
-                                           (file-directory-p (concat project "/.git/")))
-                                         (projectile-relevant-known-projects))))
-            (setq magit-repository-directories-depth 1)))
-#+END_SRC
-
-** Yasnippets configuration
-#+BEGIN_SRC emacs-lisp
-  (require 'yasnippet)
-  (yas-global-mode 1)
-#+END_SRC
-
-** Pos-tip configuration
- #+BEGIN_SRC emacs-lisp
-   (require 'pos-tip)
- #+END_SRC
- 
-** Flycheck configuration
-#+BEGIN_SRC emacs-lisp
-  (require 'flycheck)
-  (add-hook 'after-init-hook #'global-flycheck-mode)
-#+END_SRC
-
-** Company configuration
-*** TODO Yasnippet completion suggestions not showing in company 
-*** General setup
-#+BEGIN_SRC emacs-lisp
-  (require 'company)
-  ;; Initialize company mode globally
-  (add-hook 'after-init-hook 'global-company-mode)
-  ;; Set global company backends
-  (setq company-backends
-        '((company-files
-           company-keywords
-           company-capf
-           company-yasnippet
-           )
-          (company-abbrev company-dabbrev company-dabbrev-code)
-          ))
-  (global-set-key (kbd "M-/") 'company-complete)
-  (setq company-idle-delay .3)
-
-  ;; Add yasnippet support for all company backends
-  ;; https://github.com/syl20bnr/spacemacs/pull/179
-  (defvar company-mode/enable-yas t
-    "Enable yasnippet for all backends.")
-  (defun company-mode/backend-with-yas (backend)
-    (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-        backend
-      (append (if (consp backend) backend (list backend))
-              '(:with company-yasnippet))))
-  (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
-
-  ;; Company-quickhelp
-  (company-quickhelp-mode 1)
-  (setq company-quickhelp-delay .3)
+  (use-package company-quickhelp
+    :defer t
+    :ensure t
+    :init
+    (progn
+      (setq company-quickhelp-delay .3)
+      (company-quickhelp-mode 1)))
 #+END_SRC
 
 *** Python completion
 #+BEGIN_SRC emacs-lisp
   (setq python-shell-interpreter "/usr/bin/ipython3")
-  (add-hook 'python-mode-hook 'jedi:setup)
-  (setq jedi:complete-on-dot t)
-  (setq jedi:get-in-function-call-delay 500)
+  (use-package jedi-core
+    :ensure t
+    :init
+    (progn
+      (setq jedi:complete-on-dot t
+            jedi:get-in-function-call-delay 500)
+      (add-hook 'python-mode-hook 'jedi:setup)))
+
+  (use-package elpy
+    :ensure t
+    :init
+    (progn
+      (setq elpy-rpc-backend "jedi")
+      ;; Elpy uses company for completion
+      ;; so we don't have to specify a backend
+      (elpy-enable)))
 #+END_SRC
 
-*** Elpy configuration
+*** (S)CSS completion
 #+BEGIN_SRC emacs-lisp
-  (require 'elpy)
-  ;; Elpy uses company for completion, so we only have to enable it
-  (elpy-enable)
-  ;; Use Jedi as a backend for elpy (personal preference)
-  (setq elpy-rpc-backend "jedi")
-#+END_SRC
-
-*** Web-mode configuration
-#+BEGIN_SRC emacs-lisp
-  (require 'company-web)
-  (defun my/web-mode-hook ()
-    (add-to-list 'company-backends '(company-tern company-web-html)))
-  (add-hook 'web-mode-hook 'my/web-mode-hook)
-  ;; Enable JavaScript completion between <script>...</script> tags
-  (defadvice company-tern (before web-mode-set-up-ac-sources activate)
-    "Set `tern-mode' based on current language before running company-tern."
-    (message "advice")
-    (if (equal major-mode 'web-mode)
-        (let ((web-mode-cur-language
-               (web-mode-language-at-pos)))
-          (if (or (string= web-mode-cur-language "javascript")
-                  (string= web-mode-cur-language "jsx")
-                  )
-              (unless tern-mode (tern-mode))
-            (if tern-mode (tern-mode -1))))))
-#+END_SRC
-
-*** Emmet-mode configuration
-#+BEGIN_SRC emacs-lisp
-  (require 'emmet-mode)
-  (add-hook 'html-mode-hook 'emmet-mode)
-  (add-hook 'css-mode-hook 'emmet-mode)
-  (add-hook 'scss-mode-hook 'emmet-mode)
-#+END_SRC
-
-*** CSS/SCSS-mode configuration
-#+BEGIN_SRC emacs-lisp
-  (require 'scss-mode)
-  (add-to-list 'auto-mode-alist '("\\.scss\\'" . scss-mode))
-  (setq scss-compile-at-save nil)
-  (defun my/css-mode-hook()
+  (defun my/css-mode-hook ()
     (add-to-list 'company-backends 'company-css))
   (add-hook 'css-mode-hook 'my/css-mode-hook)
-  (add-hook 'scss-mode-hook 'my/css-mode-hook)
+  (use-package scss-mode
+    :ensure t
+    :mode ("\\.scss\\'" . scss-mode)
+    :init
+    (progn
+      (setq scss-compile-at-save nil)
+      (add-hook 'scss-mode-hook 'my/css-mode-hook)))
 #+END_SRC
 
-*** Javascript configuration
+*** ES/JS completion
 #+BEGIN_SRC emacs-lisp
-  (require 'company-tern)
   (defun my/js-mode-hook ()
     (add-to-list 'company-backends 'company-tern))
-  (add-hook 'js-mode-hook 'my/js-mode-hook)
+  (use-package company-tern
+    :ensure t
+    :defer t
+    :init
+    (progn
+      (add-hook 'js-mode-hook 'my/js-mode-hook)))
 #+END_SRC
 
-*** C/C++ configuration
-*Helm-gtags setup*
+*** C/C++ completion
+*Function args*
 #+BEGIN_SRC emacs-lisp
-  (setq
-   helm-gtags-ignore-case t
-   helm-gtags-auto-update t
-   helm-gtags-use-input-at-cursor t
-   helm-gtags-pulse-at-cursor t
-   helm-gtags-prefix-key "\C-cg"
-   helm-gtags-suggested-key-mapping t
-   )
-
-  (require 'helm-gtags)
-  ;; Enable helm-gtags-mode
-  (add-hook 'dired-mode-hook 'helm-gtags-mode)
-  (add-hook 'eshell-mode-hook 'helm-gtags-mode)
-  (add-hook 'c-mode-hook 'helm-gtags-mode)
-  (add-hook 'c++-mode-hook 'helm-gtags-mode)
-  (add-hook 'asm-mode-hook 'helm-gtags-mode)
-
-  (define-key helm-gtags-mode-map (kbd "C-c g a")	'helm-gtags-tags-in-this-function)
-  (define-key helm-gtags-mode-map (kbd "C-j")		'helm-gtags-select)
-  (define-key helm-gtags-mode-map (kbd "M-.")		'helm-gtags-dwim)
-  (define-key helm-gtags-mode-map (kbd "M-,")		'helm-gtags-pop-stack)
-  (define-key helm-gtags-mode-map (kbd "C-c <")		'helm-gtags-previous-history)
-  (define-key helm-gtags-mode-map (kbd "C-c >")		'helm-gtags-next-history)
+  (use-package function-args
+    :ensure t
+    :mode ("\\.h\\'" . c++-mode)
+    :init
+    (progn
+      (set-default 'semantic-case-fold t)
+      (fa-config-default)))
 #+END_SRC
 
-*Function-args setup*
+*Company clang*
 #+BEGIN_SRC emacs-lisp
-  (require 'function-args)
-  (fa-config-default)
-  ;; Put C++ mode as default for header files
-  (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-  ;; Enable case-insensitive searching for semantic
-  (set-default 'semantic-case-fold t)
-#+END_SRC
-
-*Company-clang setup*
-#+BEGIN_SRC emacs-lisp
-  ;; Semantic is first-in-order for completion
-  ;; We remove it so company uses clang as back-end
-  ;; Company-backends are set after init and do not include semantic or clang yet
-  ;; Therefore this is currently not necessary
-  ;;(setq company-backends (delete 'company-semantic company-backends))
-  (setq c-default-style "linux")
-#+END_SRC
-
-*Company-c-headers setup*
-#+BEGIN_SRC emacs-lisp
-  (require 'company-c-headers)
-  (defun my/c-mode-hook()
-    (add-to-list 'company-backends 'company-c-headers)
+  (defun my/c-mode-hook ()
     (add-to-list 'company-backends 'company-clang))
   (add-hook 'c-mode-hook 'my/c-mode-hook)
   (add-hook 'c++-mode-hook 'my/c-mode-hook)
-  ;; Add paths to C++ headers
-  (add-to-list 'company-c-headers-path-system "/usr/include/c++/6.1.1/")
-#+END_SRC
-** Org-mode configuration
-#+BEGIN_SRC emacs-lisp
-  (require 'org)
-  (global-set-key "\C-cl" 'org-store-link)
-  (global-set-key "\C-ca" 'org-agenda)
-  (global-set-key "\C-cc" 'org-capture)
-  (global-set-key "\C-cb" 'org-iswitchb)
-  (setq org-log-done t)
+  (setq c-default-style "linux")
 #+END_SRC
 
-** Avy & Ace-window
+*Company-c-headers*
 #+BEGIN_SRC emacs-lisp
-  (require 'avy)
-  (avy-setup-default)
-  (setq avy-keys (number-sequence ?a ?z))
-  (setq avy-all-windows 'all-frames)
-  (setq avy-case-fold-search nil)
-  ;; Keybinds
-  (global-set-key (kbd "M-s c") 'avy-goto-char)
-  (global-set-key (kbd "M-s s") 'avy-goto-char-2)
-  (global-set-key (kbd "M-s l") 'avy-goto-line)
-  (global-set-key (kbd "M-s e") 'avy-goto-word-0)
-  (global-set-key (kbd "M-s w") 'avy-goto-word-1)
-  ;; Evil-mode keybinds
-  (define-key evil-normal-state-map (kbd "s") 'avy-goto-char-2)  
-  (define-key evil-motion-state-map (kbd "z") 'avy-goto-char-2)
-  (define-key evil-visual-state-map (kbd "z") 'avy-goto-char-2)
-  (require 'ace-window)
-  (global-set-key (kbd "M-n") 'ace-window)
+  (use-package company-c-headers
+    :ensure t
+    :defer t
+    :init
+    (progn
+      (add-hook 'c-mode-hook (lambda ()
+                               (add-to-list 'company-backends 'company-c-headers)))
+      (add-hook 'c++-mode-hook (lambda ()
+                               (add-to-list 'company-backends 'company-c-headers))))
+    :config
+    ((add-to-list 'company-c-headers-path-system "/usr/include/c++/6.1.1")))
 #+END_SRC
+
+*Helm-gtags*
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-gtags
+    :ensure t
+    :defer t
+    :init
+    (progn
+      (setq helm-gtags-ignore-case t
+            helm-gtags-auto-update t
+            helm-gtags-use-input-at-cursor t
+            helm-gtags-pulse-at-cursor t
+            helm-gtags-prefix-key "\C-cg"
+            helm-gtags-suggested-key-mapping t)
+      (add-hook 'dired-mode-hook 'helm-gtags-mode)
+      (add-hook 'eshell-mode-hook 'helm-gtags-mode)
+      (add-hook 'c-mode-hook 'helm-gtags-mode)
+      (add-hook 'c++-mode-hook 'helm-gtags-mode)
+      (add-hook 'asm-mode-hook 'helm-gtags-mode))
+    :bind (:map helm-gtags-mode-map
+           ("C-c g a" . helm-gtags-tags-in-this-function)
+           ("C-j" . helm-gtags-select)
+           ("M-." . helm-gtags-dwim)
+           ("M-," . helm-gtags-pop-stack)
+           ("C-c <" . helm-gtags-previous-history)
+           ("C-c >" . helm-gtags-next-history)))
+#+END_SRC
+
+** Org-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure t
+    :pin org
+    :init
+    (progn
+      (setq org-log-done t))
+    :bind (("\C-cl" . org-store-link)
+           ("\C-ca" . org-agenda)
+           ("\C-cc" . org-capture)
+           ("\C-cb" . org-iswitchb)
+           :map evil-normal-state-map
+           ("t" . org-todo)
+           ("T" . org-insert-todo-heading)
+           ("; a" . org-agenda)
+           ("; t" . org-show-todo-tree)
+           ("; c" . org-archive-subtree)
+           ("; l" . org-store-link)))
+#+END_SRC
+
+** Avy/Ace-window
+#+BEGIN_SRC emacs-lisp
+  (use-package avy
+    :ensure t
+    :init
+    (progn
+      (avy-setup-default)
+      (setq avy-keys (number-sequence ?a ?z)
+            avy-all-windows 'all-frames
+            avy-case-fold-search nil))
+    :bind (("M-s c" . avy-goto-char)
+           ("M-s s" . avy-goto-char-2)
+           ("M-s l" . avy-goto-line)
+           ("M-s e" . avy-goto-word-0)
+           ("M-s w" . avy-goto-word-1)
+           :map evil-normal-state-map
+           ("s" . avy-goto-char-2)
+           :map evil-motion-state-map
+           ("s" . avy-goto-char-2)))
+
+  (use-package ace-window
+    :ensure t
+    :bind (("M-n" . ace-window)
+           :map evil-normal-state-map
+           ("; n" . ace-window)))
+#+END_SRC   
 
 ** Smart-mode-line
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'after-init-hook 'sml/setup)
+  (use-package smart-mode-line
+    :ensure t
+    :init
+    (progn
+      (add-hook 'after-init-hook 'sml/setup)))
 #+END_SRC
 
-** Themes
+** Theme
 #+BEGIN_SRC emacs-lisp
-  ;; Treat all themes as safe
   (setq custom-safe-themes t)
-  (setq solarized-distinct-fringe-background nil)
-  (setq solarized-use-variable-pitch nil) ;
-  (setq solarized-high-contrast-modeline t)
   (setq x-underline-at-descent-line t)
-  (load-theme 'solarized-light t)
+  (use-package solarized-theme
+    :ensure t
+    :init
+    (progn
+      (setq solarized-distinct-fringe-background nil
+            solarized-use-variable-pitch nil
+            solarized-high-contrast-modeline t)
+      (load-theme 'solarized-light t)))
 #+END_SRC
