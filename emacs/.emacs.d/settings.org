@@ -219,6 +219,7 @@
   (add-hook 'after-init-hook 'global-company-mode)
 #+END_SRC
 
+*Company-quickhelp pop-ups*
 #+BEGIN_SRC emacs-lisp
   (use-package company-quickhelp
     :defer t
@@ -227,6 +228,19 @@
     (progn
       (setq company-quickhelp-delay .3)
       (company-quickhelp-mode 1)))
+#+END_SRC
+
+*Yasnippet integration in every backend*
+#+BEGIN_SRC emacs-lisp
+  ;; Add yasnippet support for all company backends
+  (defvar company-mode/enable-yas t
+  "Enable yasnippet for all backends.")
+  (defun company-mode/backend-with-yas (backend)
+  (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+      backend
+      (append (if (consp backend) backend (list backend))
+              '(:with company-yasnippet))))
+  (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 #+END_SRC
 
 *** Python completion
@@ -442,17 +456,4 @@
             solarized-use-variable-pitch nil
             solarized-high-contrast-modeline t)
       (load-theme 'solarized-light t)))
-#+END_SRC
-
-** Testing order of evaluation
-#+BEGIN_SRC emacs-lisp
-;; Add yasnippet support for all company backends
-      (defvar company-mode/enable-yas t
-      "Enable yasnippet for all backends.")
-      (defun company-mode/backend-with-yas (backend)
-      (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
-         backend
-         (append (if (consp backend) backend (list backend))
-                 '(:with company-yasnippet))))
-        (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 #+END_SRC
