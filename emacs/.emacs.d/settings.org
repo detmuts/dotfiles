@@ -38,6 +38,16 @@
 	  (setq evil-shift-width 2))
   (add-hook 'css-mode-hook 'space-indent-hook)
   (add-hook 'scss-mode-hook 'space-indent-hook)
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+#+END_SRC
+
+*Aliases*
+#+BEGIN_SRC emacs-lisp
+  ;; Align-regexp
+  (defalias 'ar #'align-regexp)
+  ;; List-packages
+  (defalias 'lp #'list-packages)
 #+END_SRC
 
 * Package settings
@@ -199,16 +209,17 @@
     :ensure t
     :init
     (progn
-      (setq company-backends
-            '((company-files company-keywords company-capf company-yasnippet)
-              (company-abbrev company-dabbrev company-dabbrev-code))
-            company-idle-delay .3)
-      (add-hook 'after-init-hook 'global-company-mode))
+      (setq company-idle-delay .3))
+    :config
+    (setq company-backends (delete 'company-semantic company-backends))
     :bind (("M-/" . company-complete)
            :map evil-insert-state-map
-           ("C-n" . company-select-next)
-           ("C-p" . company-select-previous)))
+           ("C-p" . company-select-previous)
+           ("C-n" . company-select-next)))
+  (add-hook 'after-init-hook 'global-company-mode)
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp
   (use-package company-quickhelp
     :defer t
     :ensure t
@@ -303,6 +314,12 @@
 #+END_SRC
 
 *** C/C++ completion
+*General emacs settings*
+#+BEGIN_SRC emacs-lisp
+  (setq c-default-style "linux")
+  (setq c-basic-offset 4)
+#+END_SRC
+
 *Function args*
 #+BEGIN_SRC emacs-lisp
   (use-package function-args
@@ -312,15 +329,6 @@
     (progn
       (set-default 'semantic-case-fold t)
       (fa-config-default)))
-#+END_SRC
-
-*Company clang*
-#+BEGIN_SRC emacs-lisp
-  (defun my/c-mode-hook ()
-    (add-to-list 'company-backends 'company-clang))
-  (add-hook 'c-mode-hook 'my/c-mode-hook)
-  (add-hook 'c++-mode-hook 'my/c-mode-hook)
-  (setq c-default-style "linux")
 #+END_SRC
 
 *Company-c-headers*
@@ -333,9 +341,9 @@
       (add-hook 'c-mode-hook (lambda ()
                                (add-to-list 'company-backends 'company-c-headers)))
       (add-hook 'c++-mode-hook (lambda ()
-                               (add-to-list 'company-backends 'company-c-headers))))
+                                 (add-to-list 'company-backends 'company-c-headers))))
     :config
-    ((add-to-list 'company-c-headers-path-system "/usr/include/c++/6.1.1")))
+    (add-to-list 'company-c-headers-path-system "/usr/include/c++/6.1.1"))
 #+END_SRC
 
 *Helm-gtags*
@@ -434,4 +442,17 @@
             solarized-use-variable-pitch nil
             solarized-high-contrast-modeline t)
       (load-theme 'solarized-light t)))
+#+END_SRC
+
+** Testing order of evaluation
+#+BEGIN_SRC emacs-lisp
+;; Add yasnippet support for all company backends
+      (defvar company-mode/enable-yas t
+      "Enable yasnippet for all backends.")
+      (defun company-mode/backend-with-yas (backend)
+      (if (or (not company-mode/enable-yas) (and (listp backend) (member 'company-yasnippet backend)))
+         backend
+         (append (if (consp backend) backend (list backend))
+                 '(:with company-yasnippet))))
+        (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 #+END_SRC
