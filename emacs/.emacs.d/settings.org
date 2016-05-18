@@ -20,7 +20,11 @@
 
 *Basic settings*
 #+BEGIN_SRC emacs-lisp
+  ;; No more backups needed with super-save!
+  (setq auto-save-default nil)
+  ;; Get rid of that ugly toolbar
   (tool-bar-mode -1)
+  ;; No one wants to type 2 extra characters
   (fset 'yes-or-no-p 'y-or-n-p)
   ;; Enable line numbers
   (global-linum-mode t)
@@ -187,9 +191,6 @@
             ("; i" . helm-swoop)
             ("; m" . helm-multi-swoop)
             :map evil-visual-state-map
-            ("; i" . helm-swoop)
-            ("; m" . helm-multi-swoop)
-            :map evil-insert-state-map
             ("; i" . helm-swoop)
             ("; m" . helm-multi-swoop)))
 #+END_SRC

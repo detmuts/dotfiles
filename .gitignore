@@ -5,3 +5,4 @@
 /emacs/.emacs.d/settings.el
 !/.gitignore
 /emacs/.emacs.d/settings.old.org
+/emacs/.emacs.d/#init.el#
