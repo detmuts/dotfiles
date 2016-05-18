@@ -15,14 +15,18 @@
     (require 'use-package))
   (require 'diminish)
   (require 'bind-key)
+  (require 'async)
 #+END_SRC
 
 *Basic settings*
 #+BEGIN_SRC emacs-lisp
+  (tool-bar-mode -1)
   (fset 'yes-or-no-p 'y-or-n-p)
   ;; Enable line numbers
   (global-linum-mode t)
   (setq linum-format "%6d ")
+  (linum-relative-global-mode 1)
+  (setq linum-relative-current-symbol "")
   (column-number-mode t)
   ;; Automatically insert closing parens/brackets/...
   (electric-pair-mode 1)
@@ -32,10 +36,10 @@
               (interactive) (setq show-trailing-whitespace 1)))
   ;; Set indentation
   (setq css-indent-offset 2)
-  (defun space-indent-hook ()             
+  (defun space-indent-hook ()
           (setq c-basic-offset 2)
           (setq indent-tabs-mode nil)
-	  (setq evil-shift-width 2))
+      (setq evil-shift-width 2))
   (add-hook 'css-mode-hook 'space-indent-hook)
   (add-hook 'scss-mode-hook 'space-indent-hook)
   (setq-default indent-tabs-mode nil)
@@ -100,7 +104,10 @@
     (progn
       (require 'helm-config)
       (setq helm-split-window-in-side-p t
-            helm-move-to-line-cycle-in-source t)
+            helm-move-to-line-cycle-in-source t
+            helm-buffers-fuzzy-matching t
+            helm-ff-file-name-history-use-recentf t
+            helm-M-x-fuzzy-match t)
       (helm-mode 1))
     :config
     ()
@@ -130,7 +137,9 @@
 
   (use-package helm-descbinds
     :ensure t
-    :defer t)
+    :defer t
+    :init
+    (helm-descbinds-mode))
 #+END_SRC
 
 *** Helm-Projectile
@@ -154,6 +163,35 @@
            ("; p f" . helm-projectile-find-file)
            ("; p d" . helm-projectile-find-dir)
            ("; p b" . helm-projectile-switch-to-buffer)))
+#+END_SRC
+
+*** Helm-Swoop
+#+BEGIN_SRC emacs-lisp
+    (use-package helm-swoop
+      :ensure t
+      :defer t
+      :init
+      (progn
+        (setq helm-multi-swoop-edit-save t
+              helm-swoop-split-direction 'split-window-vertically
+              helm-swoop-move-to-line-cycle t))
+      :bind(("M-s o" . helm-swoop)
+            ("M-s /" . helm-multi-swoop)
+            :map helm-swoop-map
+            ("C-p" . helm-previous-line)
+            ("C-n" . helm-next-line)
+            :map helm-multi-swoop-map
+            ("C-p" . helm-previous-line)
+            ("C-n" . helm-next-line)
+            :map evil-normal-state-map
+            ("; i" . helm-swoop)
+            ("; m" . helm-multi-swoop)
+            :map evil-visual-state-map
+            ("; i" . helm-swoop)
+            ("; m" . helm-multi-swoop)
+            :map evil-insert-state-map
+            ("; i" . helm-swoop)
+            ("; m" . helm-multi-swoop)))
 #+END_SRC
 
 ** Magit
@@ -394,7 +432,8 @@
     :pin org
     :init
     (progn
-      (setq org-log-done t))
+      (setq org-log-done t
+            org-src-fontify-natively t))
     :bind (("\C-cl" . org-store-link)
            ("\C-ca" . org-agenda)
            ("\C-cc" . org-capture)
@@ -432,8 +471,20 @@
     :ensure t
     :bind (("M-n" . ace-window)
            :map evil-normal-state-map
+           ("; n" . ace-window)
+           :map evil-visual-state-map
            ("; n" . ace-window)))
 #+END_SRC   
+
+** Super-save
+#+BEGIN_SRC emacs-lisp
+  (use-package super-save
+    :ensure t
+    :init
+    (setq super-save-auto-save-when-idle t)
+    :config
+    (super-save-mode +1))
+#+END_SRC
 
 ** Smart-mode-line
 #+BEGIN_SRC emacs-lisp
@@ -453,6 +504,7 @@
     :init
     (progn
       (setq solarized-distinct-fringe-background nil
+            solarized-scale-org-headlines nil
             solarized-use-variable-pitch nil
             solarized-high-contrast-modeline t)
       (load-theme 'solarized-light t)))
