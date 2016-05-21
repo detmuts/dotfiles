@@ -1,4 +1,5 @@
 * Global settings
+** Basic setting
 *Add package archives*
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
@@ -18,7 +19,6 @@
   (require 'async)
 #+END_SRC
 
-*Basic settings*
 #+BEGIN_SRC emacs-lisp
   ;; No more backups needed with super-save!
   (setq auto-save-default nil)
@@ -50,7 +50,7 @@
   (setq-default tab-width 4)
 #+END_SRC
 
-*Aliases*
+** Aliases
 #+BEGIN_SRC emacs-lisp
   ;; Align-regexp
   (defalias 'ar #'align-regexp)
@@ -195,6 +195,21 @@
             ("; m" . helm-multi-swoop)))
 #+END_SRC
 
+** Hydra
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra
+    :ensure t
+    :defer t)
+#+END_SRC
+
+*Text-scaling hydra*
+#+BEGIN_SRC emacs-lisp
+  (defhydra hydra-zoom (global-map "<f2>")
+    "zoom"
+    ("g" text-scale-increase "in")
+    ("l" text-scale-decrease "out"))
+#+END_SRC
+
 ** Magit
 *General setup*
 #+BEGIN_SRC emacs-lisp
@@ -224,6 +239,8 @@
     :ensure t
     :init
     (progn
+      (add-to-list 'load-path
+                "~/.emacs.d/plugins/yasnippet")
       (yas-global-mode 1)))
 #+END_SRC
 
