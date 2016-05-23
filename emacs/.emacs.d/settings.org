@@ -120,7 +120,7 @@
            ("<tab>" . helm-execute-persistent-action)
            ("C-z" . helm-select-action)
            :map evil-normal-state-map
-           ("<SPC> b" . helm-buffers-list)
+           ("<SPC> e" . helm-buffers-list)
            ("<SPC> d" . helm-browse-project)
            ("<SPC> f" . helm-find-files)
            ("<SPC> x" . helm-M-x)
@@ -225,7 +225,7 @@
                                              (projectile-relevant-known-projects))))))
       :bind (("C-x g" . magit-status)
              :map evil-normal-state-map
-             ("; g" . magit-status)))
+             ("<SPC> g" . magit-status)))
 #+END_SRC
 
 ** Yasnippet
@@ -444,6 +444,7 @@
   (use-package org
     :ensure t
     :pin org
+    :mode (("\\.org$" . org-mode))
     :init
     (progn
       (setq org-log-done t
@@ -452,13 +453,14 @@
            ("\C-ca" . org-agenda)
            ("\C-cc" . org-capture)
            ("\C-cb" . org-iswitchb)
-           :map evil-normal-state-map
-           ("t" . org-todo)
-           ("T" . org-insert-todo-heading)
-           ("<SPC> a" . org-agenda)
-           ("<SPC> t" . org-show-todo-tree)
-           ("<SPC> c" . org-archive-subtree)
-           ("<SPC> l" . org-store-link)))
+;           :map evil-normal-state-map
+;           ("t" . org-todo)
+;           ("T" . org-insert-todo-heading)
+;           ("<SPC> a" . org-agenda)
+;           ("<SPC> t" . org-show-todo-tree)
+;           ("<SPC> c" . org-archive-subtree)
+;           ("<SPC> l" . org-store-link)
+))
 #+END_SRC
 
 ** Avy/Ace-window
