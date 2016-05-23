@@ -1,5 +1,5 @@
 * Global settings
-** Basic setting
+** Initialization
 *Add package archives*
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
@@ -43,11 +43,6 @@
   ;; Set default indentation settings
   (setq-default indent-tabs-mode nil)
   (setq-default tab-width 4)
-  ;; Set language-specific indentation settings
-  (defun space-indent-hook ()
-          (setq css-indent-offset 2))
-  (add-hook 'css-mode-hook 'space-indent-hook)
-  (add-hook 'scss-mode-hook 'space-indent-hook)
 #+END_SRC
 
 ** Aliases
@@ -73,16 +68,16 @@
              ("L" . evil-end-of-line)
              ("H" . evil-beginning-of-line)
              ;; Buffer/file management
-             ("; k" . kill-buffer)
-             ("; K" . kill-some-buffers)
-             ("; c" . clone-indirect-buffer)
-             ("; w c" . clone-indirect-buffer-other-window)
-             ("; w f" . find-file-other-window)
+             ("<SPC> k" . kill-buffer)
+             ("<SPC> K" . kill-some-buffers)
+             ("<SPC> c" . clone-indirect-buffer)
+             ("<SPC> w c" . clone-indirect-buffer-other-window)
+             ("<SPC> w f" . find-file-other-window)
              ;; Window management
-             ("; 0" . delete-window)
-             ("; 1" . delete-other-windows)
-             ("; 2" . split-window-below)
-             ("; 3" . split-window-right)
+             ("<SPC> 0" . delete-window)
+             ("<SPC> 1" . delete-other-windows)
+             ("<SPC> 2" . split-window-below)
+             ("<SPC> 3" . split-window-right)
              :map evil-visual-state-map
              ("L" . evil-end-of-line)
              ("H" . evil-beginning-of-line)))
@@ -125,11 +120,11 @@
            ("<tab>" . helm-execute-persistent-action)
            ("C-z" . helm-select-action)
            :map evil-normal-state-map
-           ("; b" . helm-buffers-list)
-           ("; d" . helm-browse-project)
-           ("; f" . helm-find-files)
-           ("; x" . helm-M-x)
-           ("; y" . helm-show-kill-ring)))
+           ("<SPC> b" . helm-buffers-list)
+           ("<SPC> d" . helm-browse-project)
+           ("<SPC> f" . helm-find-files)
+           ("<SPC> x" . helm-M-x)
+           ("<SPC> y" . helm-show-kill-ring)))
 
   (use-package helm-ag
     :ensure t
@@ -163,10 +158,10 @@
     (progn
       (helm-projectile-on))
     :bind (:map evil-normal-state-map
-           ("; p h" . helm-projectile)
-           ("; p f" . helm-projectile-find-file)
-           ("; p d" . helm-projectile-find-dir)
-           ("; p b" . helm-projectile-switch-to-buffer)))
+           ("<SPC> p h" . helm-projectile)
+           ("<SPC> p f" . helm-projectile-find-file)
+           ("<SPC> p d" . helm-projectile-find-dir)
+           ("<SPC> p b" . helm-projectile-switch-to-buffer)))
 #+END_SRC
 
 *** Helm-Swoop
@@ -188,11 +183,11 @@
             ("C-p" . helm-previous-line)
             ("C-n" . helm-next-line)
             :map evil-normal-state-map
-            ("; i" . helm-swoop)
-            ("; m" . helm-multi-swoop)
+            ("<SPC> i" . helm-swoop)
+            ("<SPC> m" . helm-multi-swoop)
             :map evil-visual-state-map
-            ("; i" . helm-swoop)
-            ("; m" . helm-multi-swoop)))
+            ("<SPC> i" . helm-swoop)
+            ("<SPC> m" . helm-multi-swoop)))
 #+END_SRC
 
 ** Hydra
@@ -360,7 +355,8 @@
 *** (S)CSS completion
 #+BEGIN_SRC emacs-lisp
   (defun my/css-mode-hook ()
-    (add-to-list 'company-backends 'company-css))
+    (add-to-list 'company-backends 'company-css)
+    (setq css-indent-offset 2))
   (add-hook 'css-mode-hook 'my/css-mode-hook)
   (use-package scss-mode
     :ensure t
@@ -459,10 +455,10 @@
            :map evil-normal-state-map
            ("t" . org-todo)
            ("T" . org-insert-todo-heading)
-           ("; a" . org-agenda)
-           ("; t" . org-show-todo-tree)
-           ("; c" . org-archive-subtree)
-           ("; l" . org-store-link)))
+           ("<SPC> a" . org-agenda)
+           ("<SPC> t" . org-show-todo-tree)
+           ("<SPC> c" . org-archive-subtree)
+           ("<SPC> l" . org-store-link)))
 #+END_SRC
 
 ** Avy/Ace-window
@@ -482,6 +478,7 @@
            ("M-s w" . avy-goto-word-1)
            :map evil-normal-state-map
            ("s" . avy-goto-char-2)
+           ("<SPC> l" . avy-goto-line)
            :map evil-motion-state-map
            ("s" . avy-goto-char-2)))
 
@@ -489,9 +486,9 @@
     :ensure t
     :bind (("M-n" . ace-window)
            :map evil-normal-state-map
-           ("; n" . ace-window)
+           ("<SPC> n" . ace-window)
            :map evil-visual-state-map
-           ("; n" . ace-window)))
+           ("<SPC> n" . ace-window)))
 #+END_SRC   
 
 ** Super-save
