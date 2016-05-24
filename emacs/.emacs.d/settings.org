@@ -9,7 +9,7 @@
   (setq package-enable-at-startup nil)
 #+END_SRC
 
-*Initialize use-package*
+*Compile-time packages*
 #+BEGIN_SRC emacs-lisp
   (eval-when-compile
     (require 'cl-lib)
@@ -19,6 +19,7 @@
   (require 'async)
 #+END_SRC
 
+*Default settings*
 #+BEGIN_SRC emacs-lisp
   ;; No more backups needed with super-save!
   (setq auto-save-default nil)
@@ -57,7 +58,7 @@
   (use-package smartparens
     :ensure t
     :defer t
-    :init
+    :init 
     ()
     :config
     (require 'smartparens-config))
@@ -137,7 +138,7 @@
            ("<SPC> e" . helm-buffers-list)
            ("<SPC> d" . helm-browse-project)
            ("<SPC> f" . helm-find-files)
-           ("<SPC> x" . helm-M-x)
+           ("<SPC> <SPC>" . helm-M-x)
            ("<SPC> y" . helm-show-kill-ring)))
 
   (use-package helm-ag
@@ -257,6 +258,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :ensure t
+    :diminish flycheck-mode
     :init
     (progn
       (add-hook 'after-init-hook #'global-flycheck-mode)))
@@ -332,6 +334,15 @@
 *** Ruby completion
 #+BEGIN_SRC emacs-lisp
   (setq ruby-indent-level 2)
+  (use-package ruby-mode
+    :mode ("\\.rb\\'"
+           "\\.ru\\'"
+           "\\.rake\\'"
+           "\\.gemspec\\'"
+           "\\Rakefile\\'"
+           "\\Gemfile\\'")
+    :interpreter "ruby")
+
   (use-package inf-ruby
     :ensure t
     :defer t
@@ -526,6 +537,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package super-save
     :ensure t
+    :diminish super-save-mode
     :init
     (setq super-save-auto-save-when-idle t)
     :config
