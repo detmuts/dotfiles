@@ -34,8 +34,6 @@
   (linum-relative-global-mode 1)
   (setq linum-relative-current-symbol "")
   (column-number-mode t)
-  ;; Automatically insert closing parens/brackets/...
-  (electric-pair-mode 1)
   ;; Show trailing whitespace
   (add-hook 'prog-mode-hook
             (lambda()
@@ -54,43 +52,59 @@
 #+END_SRC
 
 * Package settings
+** Smartparens
+#+BEGIN_SRC emacs-lisp
+  (use-package smartparens
+    :ensure t
+    :defer t
+    :init
+    ()
+    :config
+    (require 'smartparens-config))
+#+END_SRC
+
 ** Evil Mode
 #+BEGIN_SRC emacs-lisp
-    (use-package evil
-      :ensure t
-      :init
-      (progn
-        (evil-mode 1))
-      :config
-      ()
-      :bind (:map evil-normal-state-map
-             ;; Movement
-             ("L" . evil-end-of-line)
-             ("H" . evil-beginning-of-line)
-             ;; Buffer/file management
-             ("<SPC> k" . kill-buffer)
-             ("<SPC> K" . kill-some-buffers)
-             ("<SPC> c" . clone-indirect-buffer)
-             ("<SPC> w c" . clone-indirect-buffer-other-window)
-             ("<SPC> w f" . find-file-other-window)
-             ;; Window management
-             ("<SPC> 0" . delete-window)
-             ("<SPC> 1" . delete-other-windows)
-             ("<SPC> 2" . split-window-below)
-             ("<SPC> 3" . split-window-right)
-             :map evil-visual-state-map
-             ("L" . evil-end-of-line)
-             ("H" . evil-beginning-of-line)))
-    (use-package evil-surround
-      :ensure t
-      :defer t
-      :init
-      (global-evil-surround-mode 1))
-    (use-package evil-nerd-commenter
-      :ensure t
-      :defer t
-      :init
-      (evilnc-default-hotkeys))
+  (use-package evil
+    :ensure t
+    :init
+    (progn
+      (evil-mode 1))
+    :config
+    ()
+    :bind (:map evil-normal-state-map
+           ;; Movement
+           ("L" . evil-end-of-line)
+           ("H" . evil-beginning-of-line)
+           ;; Buffer/file management
+           ("<SPC> k" . kill-buffer)
+           ("<SPC> K" . kill-some-buffers)
+           ("<SPC> c" . clone-indirect-buffer)
+           ("<SPC> w c" . clone-indirect-buffer-other-window)
+           ("<SPC> w f" . find-file-other-window)
+           ;; Window management
+           ("<SPC> 0" . delete-window)
+           ("<SPC> 1" . delete-other-windows)
+           ("<SPC> 2" . split-window-below)
+           ("<SPC> 3" . split-window-right)
+           ;; Universal argument remap
+           ("<SPC> u" . universal-argument)
+           :map universal-argument-map
+           ("<SPC> u" . universal-argument-more)
+           ;; Visual state equivalents
+           :map evil-visual-state-map
+           ("L" . evil-end-of-line)
+           ("H" . evil-beginning-of-line)))
+  (use-package evil-surround
+    :ensure t
+    :defer t
+    :init
+    (global-evil-surround-mode 1))
+  (use-package evil-nerd-commenter
+    :ensure t
+    :defer t
+    :init
+    (evilnc-default-hotkeys))
 #+END_SRC
 
 ** Helm
@@ -313,6 +327,21 @@
       ;; Elpy uses company for completion
       ;; so we don't have to specify a backend
       (elpy-enable)))
+#+END_SRC
+
+*** Ruby completion
+#+BEGIN_SRC emacs-lisp
+  (setq ruby-indent-level 2)
+  (use-package inf-ruby
+    :ensure t
+    :defer t
+    :init
+    (progn
+      (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)))
+
+  (use-package ruby-tools
+    :ensure t
+    :defer t)
 #+END_SRC
 
 *** Company-web-mode
