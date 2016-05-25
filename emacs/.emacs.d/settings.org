@@ -350,9 +350,11 @@
     (progn
       (add-hook 'compilation-filter-hook 'inf-ruby-auto-enter)))
 
-  (use-package ruby-tools
+  (use-package rubocop
     :ensure t
-    :defer t)
+    :defer t
+    :init
+    (add-hook 'ruby-mode-hook #'rubocop-mode))
 #+END_SRC
 
 *** Company-web-mode
