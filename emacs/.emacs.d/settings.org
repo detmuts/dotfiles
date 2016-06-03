@@ -55,13 +55,17 @@
 * Package settings
 ** Smartparens
 #+BEGIN_SRC emacs-lisp
-  (use-package smartparens
-    :ensure t
-    :defer t
-    :init 
-    ()
-    :config
-    (require 'smartparens-config))
+    (use-package smartparens
+      :ensure t
+      :defer t
+      :init
+      (progn
+        (add-hook 'js-mode-hook #'smartparens-mode)
+        (add-hook 'python-mode-hook #'smartparens-mode)
+        (add-hook 'ruby-mode-hook #'smartparens-mode)
+        (add-hook 'css-mode-hook #'smartparens-mode))
+      :config
+      (require 'smartparens-config))
 #+END_SRC
 
 ** Evil Mode
@@ -489,20 +493,20 @@
     :mode (("\\.org$" . org-mode))
     :init
     (progn
-      (setq org-log-done t
+        (setq org-log-done t
             org-src-fontify-natively t))
     :bind (("\C-cl" . org-store-link)
-           ("\C-ca" . org-agenda)
-           ("\C-cc" . org-capture)
-           ("\C-cb" . org-iswitchb)
-;           :map evil-normal-state-map
-;           ("t" . org-todo)
-;           ("T" . org-insert-todo-heading)
-;           ("<SPC> a" . org-agenda)
-;           ("<SPC> t" . org-show-todo-tree)
-;           ("<SPC> c" . org-archive-subtree)
-;           ("<SPC> l" . org-store-link)
-))
+            ("\C-ca" . org-agenda)
+            ("\C-cc" . org-capture)
+            ("\C-cb" . org-iswitchb)
+  ;;           :map evil-normal-state-map
+  ;;           ("t" . org-todo)
+  ;;           ("T" . org-insert-todo-heading)
+  ;;           ("<SPC> a" . org-agenda)
+  ;;           ("<SPC> t" . org-show-todo-tree)
+  ;;           ("<SPC> c" . org-archive-subtree)
+  ;;           ("<SPC> l" . org-store-link)
+  ))
 #+END_SRC
 
 ** Avy/Ace-window
