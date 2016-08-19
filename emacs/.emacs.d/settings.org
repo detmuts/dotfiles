@@ -21,6 +21,9 @@
 
 *Default settings*
 #+BEGIN_SRC emacs-lisp
+  ;; Add custom themes folder to load-path
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+  (add-to-list 'load-path "~/.emacs.d/themes")
   ;; No more backups needed with super-save!
   (setq auto-save-default nil)
   ;; Get rid of that ugly toolbar
@@ -122,7 +125,7 @@
     (progn
       (require 'helm-config)
       (setq helm-split-window-in-side-p t
-            helm-move-to-line-cycle-in-source t
+            ;;helm-move-to-line-cycle-in-source t
             helm-buffers-fuzzy-matching t
             helm-ff-file-name-history-use-recentf t
             helm-M-x-fuzzy-match t)
@@ -161,7 +164,7 @@
 #+END_SRC
 
 *** Helm-Projectile
-*helm-projectile configuration*
+    *helm-projectile configuration*
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :ensure t
@@ -253,8 +256,6 @@
     :ensure t
     :init
     (progn
-      (add-to-list 'load-path
-                "~/.emacs.d/plugins/yasnippet")
       (yas-global-mode 1)))
 #+END_SRC
 
@@ -485,6 +486,35 @@
            ("C-c >" . helm-gtags-next-history)))
 #+END_SRC
 
+** Neotree
+#+BEGIN_SRC emacs-lisp
+  (use-package neotree
+    :ensure t
+    :init
+    :config
+    ()
+    :bind (([f8] . neotree-toggle)))
+
+  (defun doom*neo-insert-root-entry (node)
+    "Pretty-print pwd in neotree"
+    (list (concat "  " (projectile-project-name))))
+
+  (defun doom*neo-insert-fold-symbol (name)
+    "Custom hybrid unicode theme with leading whitespace."
+    (or (and (eq name 'open)  (neo-buffer--insert-with-face " -  " 'neo-expand-btn-face))
+        (and (eq name 'close) (neo-buffer--insert-with-face " +  " 'neo-expand-btn-face))
+        (and (eq name 'leaf)  (neo-buffer--insert-with-face "   " 'neo-expand-btn-face))))
+
+  (advice-add 'neo-buffer--insert-fold-symbol :override 'doom*neo-insert-fold-symbol)
+  (advice-add 'neo-buffer--insert-root-entry :filter-args 'doom*neo-insert-root-entry)
+
+  (add-hook 'neotree-mode-hook
+          (lambda ()
+              (define-key evil-normal-state-local-map (kbd "TAB") 'neotree-enter)
+              (define-key evil-normal-state-local-map (kbd "SPC") 'neotree-enter)
+              (define-key evil-normal-state-local-map (kbd "q") 'neotree-hide)
+              (define-key evil-normal-state-local-map (kbd "RET") 'neotree-enter)))
+#+END_SRC
 ** Org-mode
 #+BEGIN_SRC emacs-lisp
   (use-package org
@@ -556,20 +586,21 @@
     :ensure t
     :init
     (progn
-      (add-hook 'after-init-hook 'sml/setup)))
+      (add-hook 'after-init-hook 'sml/setup)))    
 #+END_SRC
 
 ** Theme
 #+BEGIN_SRC emacs-lisp
   (setq custom-safe-themes t)
   (setq x-underline-at-descent-line t)
-  (use-package solarized-theme
-    :ensure t
-    :init
-    (progn
-      (setq solarized-distinct-fringe-background nil
-            solarized-scale-org-headlines nil
-            solarized-use-variable-pitch nil
-            solarized-high-contrast-modeline t)
-      (load-theme 'solarized-light t)))
+  (add-hook 'after-init-hook (lambda () (load-theme 'doom-one t)))
+  ;; (use-package solarized-theme
+  ;;   :ensure t
+  ;;   :init
+  ;;   (progn
+  ;;     (setq solarized-distinct-fringe-background nil
+  ;;           solarized-scale-org-headlines nil
+  ;;           solarized-use-variable-pitch nil
+  ;;           solarized-high-contrast-modeline t)
+  ;;     (load-theme 'solarized-light t)))
 #+END_SRC
