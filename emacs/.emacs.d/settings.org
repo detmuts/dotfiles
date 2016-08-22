@@ -261,12 +261,12 @@
 
 ** Flycheck
 #+BEGIN_SRC emacs-lisp
-  (use-package flycheck
-    :ensure t
-    :diminish flycheck-mode
-    :init
-    (progn
-      (add-hook 'after-init-hook #'global-flycheck-mode)))
+;;  (use-package flycheck
+;;    :ensure t
+;;    :diminish flycheck-mode
+;;    :init
+;;    (progn
+;;      (global-flycheck-mode)))
 #+END_SRC
 
 ** Pos-tip
@@ -317,23 +317,29 @@
 
 *** Python completion
 #+BEGIN_SRC emacs-lisp
-  (setq python-shell-interpreter "/usr/bin/ipython3")
-  (use-package jedi-core
-    :ensure t
-    :init
-    (progn
-      (setq jedi:complete-on-dot t
-            jedi:get-in-function-call-delay 500)
-      (add-hook 'python-mode-hook 'jedi:setup)))
-
-  (use-package elpy
-    :ensure t
-    :init
-    (progn
-      (setq elpy-rpc-backend "jedi")
-      ;; Elpy uses company for completion
-      ;; so we don't have to specify a backend
-      (elpy-enable)))
+;;    (setq python-shell-interpreter "/usr/bin/ipython"
+;;          python-shell-interpreter-args "-i")
+    (use-package company-jedi
+      :ensure t
+      :init
+      (progn
+        (add-to-list 'company-backends 'company-jedi)))
+  ;;  (use-package jedi-core
+  ;;    :ensure t
+  ;;    :init
+  ;;    (progn
+  ;;      (setq jedi:complete-on-dot t
+  ;;            jedi:get-in-function-call-delay 500)
+  ;;      (add-hook 'python-mode-hook 'jedi:setup)))
+  ;;
+  ;;  (use-package elpy
+  ;;    :ensure t
+  ;;    :init
+  ;;    (progn
+  ;;      (setq elpy-rpc-backend "jedi")
+  ;;      ;; Elpy uses company for completion
+  ;;      ;; so we don't have to specify a backend
+  ;;      (elpy-enable)))
 #+END_SRC
 
 *** Ruby completion
@@ -582,18 +588,44 @@
 
 ** Smart-mode-line
 #+BEGIN_SRC emacs-lisp
-  (use-package smart-mode-line
-    :ensure t
-    :init
-    (progn
-      (add-hook 'after-init-hook 'sml/setup)))    
+    (use-package smart-mode-line
+      :ensure t
+      :init
+      (progn
+        (add-hook 'after-init-hook 'sml/setup))
+      :config
+      (setq sml/theme 'respectful))
 #+END_SRC
 
 ** Theme
 #+BEGIN_SRC emacs-lisp
   (setq custom-safe-themes t)
   (setq x-underline-at-descent-line t)
-  (add-hook 'after-init-hook (lambda () (load-theme 'doom-one t)))
+  (defvar my:theme 'doom-one)
+  (defvar my:theme-window-loaded nil)
+  (defvar my:theme-terminal-loaded nil)
+
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions(lambda (frame)
+                         (select-frame frame)
+                         (if (window-system frame)
+                             (unless my:theme-window-loaded
+                               (if my:theme-terminal-loaded
+                                   (enable-theme my:theme)
+                                 (load-theme my:theme t))
+                               (setq my:theme-window-loaded t))
+                           (unless my:theme-terminal-loaded
+                             (if my:theme-window-loaded
+                                 (enable-theme my:theme)
+                               (load-theme my:theme t))
+                             (setq my:theme-terminal-loaded t)))))
+
+    (progn
+      (load-theme my:theme t)
+      (if (display-graphic-p)
+          (setq my:theme-window-loaded t)
+        (setq my:theme-terminal-loaded t))))
+
   ;; (use-package solarized-theme
   ;;   :ensure t
   ;;   :init

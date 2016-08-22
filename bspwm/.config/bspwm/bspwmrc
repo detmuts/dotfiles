@@ -41,6 +41,7 @@ bspc rule -a VirtualBox         desktop='^3'
 bspc rule -a NetBeans\ IDE\ 8.1 desktop='^3'
 bspc rule -a Emacs              desktop='^3' state=tiled
 bspc rule -a Franz              desktop='^2' state=tiled
+bspc rule -a Atom               desktop='^3' state=tiled
 
 bspc config normal_border_color         "#332d29"
 bspc config active_border_color         "#DED0BD"
