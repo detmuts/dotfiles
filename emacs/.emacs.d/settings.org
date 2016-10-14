@@ -492,6 +492,19 @@
            ("C-c >" . helm-gtags-next-history)))
 #+END_SRC
 
+*** Haskell completion
+#+BEGIN_SRC emacs-lisp
+  (use-package company-ghci
+    :ensure t
+    :init
+    (progn
+      (add-to-list 'company-backends 'company-ghci)))
+  (use-package company-ghc
+    :ensure t
+    :init
+    (progn
+      (add-to-list 'company-backends 'company-ghc)))
+#+END_SRC
 ** Neotree
 #+BEGIN_SRC emacs-lisp
   (use-package neotree

@@ -156,7 +156,7 @@ let g:airline_theme='base16_ocean'
 let g:airline_left_sep=''
 let g:airline_right_sep=''
 
-autocmd FileType ruby,erb,html,javascript,css,scss setlocal shiftwidth=2 tabstop=2
+autocmd FileType ruby,erb,html,javascript,css,scss,yaml setlocal shiftwidth=2 tabstop=2
 
 " Functions
 "

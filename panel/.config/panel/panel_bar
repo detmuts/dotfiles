@@ -17,53 +17,65 @@ while read -r line ; do
             FG_COLOR=$COLOR_SYS_FG
             BG_COLOR=$COLOR_SYS_BG
             if [[ $BATTERY == \+* ]]; then
-                BG_COLOR=$BAT_GREEN_BG
+                #BG_COLOR=$BAT_GREEN_BG
+                U_COLOR=$BAT_CHARGING_U
                 BATTERY=${BATTERY#?}
             elif [[ $BATTERY -ge 90 ]]; then
-                BG_COLOR=$BAT_GREEN_BG
+                #BG_COLOR=$BAT_GREEN_BG
+                U_COLOR=$BAT_NORMAL_U
                 BAT_ICON=""
             elif [[ $BATTERY -ge 70 ]]; then
-                BG_COLOR=$BAT_GREEN_BG
+                #BG_COLOR=$BAT_GREEN_BG
+                U_COLOR=$BAT_NORMAL_U
                 BAT_ICON=""
             elif [[ $BATTERY -ge 20 ]]; then
-                BG_COLOR=$BAT_YELLOW_BG
+                #BG_COLOR=$BAT_YELLOW_BG
+                U_COLOR=$BAT_NORMAL_U
                 BAT_ICON=""
             else
-                BG_COLOR=$BAT_RED_BG
+                #BG_COLOR=$BAT_RED_BG
+                U_COLOR=$BAT_CRITICAL_U
                 BAT_ICON=""
             fi
             bat_time=$(acpi -b | awk -F',[ ]*' '{ print $3 }' | sed 's/:/\\\\:/g')
-            bat="%{F$FG_COLOR}%{B$BG_COLOR}%{A:notify-send "remaining" "$(acpi -b | awk -F',[ ]*' '{ print $3 }' | sed 's/:/\\\\:/g' | cut -d ' ' -f 1)" -t 1000:}$SYS_PAD $BAT_ICON  $BATTERY% $SYS_PAD%{A}%{B-}%{F-}"
+            bat="%{F$FG_COLOR}%{B$BG_COLOR}%{U$U_COLOR}%{A:notify-send "remaining" "$(acpi -b | awk -F',[ ]*' '{ print $3 }' | sed 's/:/\\\\:/g' | cut -d ' ' -f 1)" -t 1000:}$SYS_PAD $BAT_ICON  $BATTERY% $SYS_PAD%{A}%{U-}%{B-}%{F-}"
             ;;
         V*)
             VOLUME=${line#?}
             VOL_ICON=""
             FG_COLOR=$COLOR_SYS_FG
-            BG_COLOR=$VOL_WHITE_BG
+            BG_COLOR=$COLOR_SYS_BG
+            #BG_COLOR=$VOL_WHITE_BG
+            U_COLOR=$VOL_UNMUTE_U
             if [[ $VOLUME == M*  ]]; then
                 FG_COLOR=$VOL_GREY_FG
-                BG_COLOR=$VOL_GREY_BG
+                #BG_COLOR=$VOL_GREY_BG
+                U_COLOR=$VOL_MUTE_U
                 VOLUME=${VOLUME#?}
 
             fi
-            vol="%{F$FG_COLOR}%{B$BG_COLOR}%{A3:amixer -D pulse set Master Playback Switch toggle:}$SYS_PAD $VOL_ICON  $VOLUME $SYS_PAD%{A}%{B-}%{F-}"
+            vol="%{F$FG_COLOR}%{B$BG_COLOR}%{U$U_COLOR}%{A3:amixer -D pulse set Master Playback Switch toggle:}$SYS_PAD $VOL_ICON  $VOLUME $SYS_PAD%{A}%{U-}%{B-}%{F-}"
             ;;
         N*)
             FG_COLOR=$COLOR_SYS_FG
-            BG_COLOR=$NET_BG
+            BG_COLOR=$COLOR_SYS_BG
+            U_COLOR=$NET_U
+            #BG_COLOR=$NET_BG
             NET_ICON=""
-            net="%{F$FG_COLOR}%{B$BG_COLOR}$SYS_PAD $NET_ICON  ${line#?} $SYS_PAD%{B-}%{F-}"
+            net="%{F$FG_COLOR}%{B$BG_COLOR}%{U$U_COLOR}$SYS_PAD $NET_ICON  ${line#?} $SYS_PAD%{U-}%{B-}%{F-}"
             ;;
         C*)
             FG_COLOR=$COLOR_SYS_FG
-            BG_COLOR=$TIME_BG
+            BG_COLOR=$COLOR_SYS_BG
+            U_COLOR=$TIME_U
+            #BG_COLOR=$TIME_BG
             CLOCK_ICON=""
-            clock="%{F$FG_COLOR}%{B$BG_COLOR}$SYS_PAD $CLOCK_ICON  ${line#?} $SYS_PAD%{B-}%{F-}"
+            clock="%{F$FG_COLOR}%{B$BG_COLOR}%{U$TIME_U}%{A2:urxvt -e 'calcurse':}$SYS_PAD $CLOCK_ICON  ${line#?} $SYS_PAD%{A}%{U-}%{B-}%{F-}"
             ;;
 		T*)
 			# xtitle output
             TITLE=$(echo ${line#?} | awk 'BEGIN{FS="[ ]*-[ ]*"; OFS=" - "} { for (i=NF; i>0; i--) { printf "%s", $i;if (i>1) { printf "%s", OFS; }}}' | cut -c 1-50)
-			title="%{F$COLOR_TITLE_FG}%{B$COLOR_TITLE_BG} $TITLE %{B-}%{F-}"
+			title="%{F$COLOR_TITLE_FG}%{B$COLOR_TITLE_BG}%{U$COLOR_TITLE_U} $TITLE %{U-}%{B-}%{F-}"
 			;;
 		W*)
 			# bspwm's state
@@ -73,6 +85,7 @@ while read -r line ; do
 			while [ $# -gt 0 ] ; do
 				item=$1
 				name=${item#?}
+                icon="◯"
 				case $item in
 					[mM]*)
 						[ $num_mon -lt 2 ] && shift && continue
@@ -106,11 +119,13 @@ while read -r line ; do
 								# occupied desktop
 								FG=$COLOR_OCCUPIED_FG
 								BG=$COLOR_OCCUPIED_BG
+                                icon="◎"
 								;;
 							O*)
 								# focused occupied desktop
 								FG=$COLOR_FOCUSED_OCCUPIED_FG
 								BG=$COLOR_FOCUSED_OCCUPIED_BG
+                                icon="◉"
 								;;
 							u*)
 								# urgent desktop
@@ -123,16 +138,17 @@ while read -r line ; do
 								BG=$COLOR_FOCUSED_URGENT_BG
 								;;
 						esac
-						wmstate="${wmstate}%{F${FG}}%{B${BG}}%{A:bspc desktop -f ${name}:}$WS_PAD ${name} $WS_PAD%{A}%{B-}%{F-}"
+						wmstate="${wmstate}%{F${FG}}%{B${COLOR_SYS_BG}}%{A:bspc desktop -f ${name}:}$WS_PAD ${icon} $WS_PAD%{A}%{B-}%{F-}"
 						;;
 					[LTG]*)
 						# layout, state and flags
-						wmstate="${wmstate}%{F$COLOR_STATE_FG}%{B$COLOR_STATE_BG} ${name} %{B-}%{F-}"
 						;;
 				esac
 				shift
 			done
+            # Extra paddding to the left to align with gaps
+            wmstate=" ${wmstate}"
 			;;
 	esac
-	printf "%s\n" "%{l}${wmstate}%{c}${title}%{r}${net}${bat}${vol}${clock}"
+	printf "%s\n" "%{l}${wmstate}%{c}%{+u}%{+o}${title}%{-o}%{r}%{+u}${net}${bat}${vol}${clock}%{-u}"
 done

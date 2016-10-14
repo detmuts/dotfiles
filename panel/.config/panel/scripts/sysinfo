@@ -11,7 +11,6 @@ battery() {
     # prepend percentage with a '+' if charging, '-' otherwise
     test "`cat $BATS`" = "Charging" && echo -n '+'
 
-    # print out the content (forced myself to use `sed` :P)
     sed -n p $BATC
 }
 
