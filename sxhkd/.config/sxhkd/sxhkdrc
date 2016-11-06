@@ -4,10 +4,10 @@
 
 # terminal emulator
 super + Return
-	urxvt
+	urxvtc
 
 super + shift + Return
-    urxvt -name "urxvt-floating"
+    urxvtc -name "urxvt-floating"
 
 # program launcher
 super + space
@@ -182,7 +182,3 @@ XF86AudioMute
 
 super + {F5,F6}
     xbacklight -{dec,inc} 10
-
-# Keyboard layout
-super + e
-    setxkbmap be && killall sxhkd && sxhkd -c $XDG_CONFIG_HOME/sxhkd/sxhkdrc-azerty &
