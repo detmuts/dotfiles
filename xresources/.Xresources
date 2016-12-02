@@ -39,6 +39,7 @@ Xft.hintstyle: hintslight
 *color7: #C5C8C6
 
 ! URxvt settings
+URxvt.internalBorder:   10
 URxvt.scrollBar: false
 URxvt.font: xft:Anonymous Pro for Powerline:pixelsize=17, \
             xft:DejaVu Sans Mono for Powerline:size=11

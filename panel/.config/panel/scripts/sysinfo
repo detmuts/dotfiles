@@ -5,13 +5,14 @@ clock() {
 }
 
 battery() {
-    BATC=/sys/class/power_supply/BAT0/capacity
+    #BATC=/sys/class/power_supply/BAT0/capacity
+    BATC=$(acpi -b | awk -F', ' '/%/ { print $2 }')
     BATS=/sys/class/power_supply/BAT0/status
 
     # prepend percentage with a '+' if charging, '-' otherwise
     test "`cat $BATS`" = "Charging" && echo -n '+'
 
-    sed -n p $BATC
+    echo "$BATC"
 }
 
 volume() {

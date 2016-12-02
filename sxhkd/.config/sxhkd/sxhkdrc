@@ -14,6 +14,9 @@ super + space
 #	j4-dmenu-desktop --dmenu="dmenu -i -l 3 -p '▶' -nb '#363B45' -nf '#8C8C8C' -sf '#FFFFFF' -sb '#363B45' -fn 'Noto Sans-12'" --term='urxvt'
     rofi -display-combi "▼ " -show
 
+super + e
+    emacsclient -c
+
 # lockscreen
 super + shift + b
     xsecurelock auth_pam_x11 saver_blank
@@ -165,6 +168,9 @@ super + {Left,Down,Up,Right}
 #
 # Custom
 #
+
+# mpc
+
 
 # Puu.sh
 alt + shift + @3

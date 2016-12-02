@@ -13,6 +13,7 @@ while read -r line ; do
         # sysinfo output
 		B*)
             BATTERY=${line#?}
+            BATTERY=${BATTERY%"%"}
             BAT_ICON=""
             FG_COLOR=$COLOR_SYS_FG
             BG_COLOR=$COLOR_SYS_BG
