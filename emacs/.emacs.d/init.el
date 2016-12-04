@@ -1,22 +1,35 @@
-(require 'package)
-(package-initialize)
-(require 'org)
-(setq user-emacs-directory "~/.emacs.d")
-(org-babel-load-file (
-        expand-file-name "settings.org"
-                        user-emacs-directory))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-enabled-themes (quote (doom-one)))
- '(package-selected-packages
-   (quote
-    (company-ghc company-ghci haskell-mode use-package tablist super-save solarized-theme smartparens smart-mode-line scss-mode rubocop org-plus-contrib neotree magit linum-relative inf-ruby hydra helm-swoop helm-projectile helm-ls-git helm-gtags helm-firefox helm-descbinds helm-ag function-args flycheck evil-surround evil-nerd-commenter emmet-mode elpy company-web company-tern company-quickhelp company-jedi company-c-headers ace-window))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;;; init.el --- Spacemacs Initialization File
+;;
+;; Copyright (c) 2012-2016 Sylvain Benner & Contributors
+;;
+;; Author: Sylvain Benner <sylvain.benner@gmail.com>
+;; URL: https://github.com/syl20bnr/spacemacs
+;;
+;; This file is not part of GNU Emacs.
+;;
+;;; License: GPLv3
+
+;; Without this comment emacs25 adds (package-initialize) here
+;; (package-initialize)
+
+;; Increase gc-cons-threshold, depending on your system you may set it back to a
+;; lower value in your dotfile (function `dotspacemacs/user-config')
+(setq gc-cons-threshold 100000000)
+
+(defconst spacemacs-version          "0.200.5" "Spacemacs version.")
+(defconst spacemacs-emacs-min-version   "24.4" "Minimal version of Emacs.")
+
+(if (not (version<= spacemacs-emacs-min-version emacs-version))
+    (message (concat "Your version of Emacs (%s) is too old. "
+                     "Spacemacs requires Emacs version %s or above.")
+             emacs-version spacemacs-emacs-min-version)
+  (load-file (concat (file-name-directory load-file-name)
+                     "core/core-load-paths.el"))
+  (require 'core-spacemacs)
+  (spacemacs/init)
+  (spacemacs/maybe-install-dotfile)
+  (configuration-layer/sync)
+  (spacemacs-buffer/display-info-box)
+  (spacemacs/setup-startup-hook)
+  (require 'server)
+  (unless (server-running-p) (server-start)))
