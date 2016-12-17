@@ -71,7 +71,7 @@ while read -r line ; do
             U_COLOR=$TIME_U
             #BG_COLOR=$TIME_BG
             CLOCK_ICON=""
-            clock="%{F$FG_COLOR}%{B$BG_COLOR}%{U$TIME_U}%{A2:urxvt -e 'calcurse':}$SYS_PAD $CLOCK_ICON  ${line#?} $SYS_PAD%{A}%{U-}%{B-}%{F-}"
+            clock="%{F$FG_COLOR}%{B$BG_COLOR}%{U$TIME_U}$SYS_PAD $CLOCK_ICON  ${line#?} $SYS_PAD%{U-}%{B-}%{F-}"
             ;;
 		T*)
 			# xtitle output
