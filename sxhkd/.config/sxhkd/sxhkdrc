@@ -11,7 +11,6 @@ super + shift + Return
 
 # program launcher
 super + space
-#	j4-dmenu-desktop --dmenu="dmenu -i -l 3 -p '▶' -nb '#363B45' -nf '#8C8C8C' -sf '#FFFFFF' -sb '#363B45' -fn 'Noto Sans-12'" --term='urxvt'
     rofi -display-combi "▼ " -show
 
 super + e
