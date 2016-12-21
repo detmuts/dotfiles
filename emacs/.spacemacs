@@ -77,6 +77,7 @@ values."
      syntax-checking
 
      ;; theming
+     theming
      themes-megapack
 
      ;; private layers
@@ -165,7 +166,7 @@ values."
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font '("Source Code Pro"
-                               :size 15
+                               :size 17
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -337,10 +338,8 @@ you should place your code here."
         org-agenda-include-diary t
         calendar-date-style "european"
         web-mode-markup-indent-offset 2
-        powerline-default-separator 'slant)
-  ;; (with-eval-after-load 'org-agenda
-  ;;   (require 'org-projectile)
-  ;;   (push (org-projectile:todo-files) org-agenda-files))
+        powerline-default-separator 'slant
+        theming-modifications '((leuven (default :background "#F2F2F2"))))
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
   (with-eval-after-load "tex"
     (add-to-list 'TeX-view-program-list
@@ -352,6 +351,9 @@ you should place your code here."
     (add-to-list 'TeX-view-program-selection
                  '(output-pdf "Zathura"))
     (TeX-PDF-mode 1))
+
+;  (set-face-attribute
+;   'default nil :font "Fantasque Sans Mono-13" :weight 'normal)
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -383,4 +385,4 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:background nil)))))
+)
