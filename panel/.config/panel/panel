@@ -1,8 +1,9 @@
 #! /bin/sh
 
 PANEL_FIFO=/tmp/panel-fifo
-PANEL_HEIGHT=30
-PANEL_FONT="NotoSans:size=11"
+PANEL_HEIGHT=32
+PANEL_WIDTH=1920
+PANEL_FONT="FantasqueSansMono-Regular:size=13"
 PANEL_FALLBACK_FONT="DejaVu Sans Mono for Powerline-11"
 PANEL_ICON_FONT="icons-12"
 PANEL_WM_NAME=bspwm_panel
@@ -32,7 +33,7 @@ $DIR/scripts/panel_volume > "$PANEL_FIFO" &
 
 . panel_colors
 
-panel_bar < "$PANEL_FIFO" | lemonbar -o -1 -u 2 -a 32 -n "$PANEL_WM_NAME" -g x$PANEL_HEIGHT -f "$PANEL_FONT" -f "$PANEL_ICON_FONT" -f "$PANEL_FALLBACK_FONT" -F "$COLOR_DEFAULT_FG" -B "$COLOR_DEFAULT_BG" | sh &
+panel_bar < "$PANEL_FIFO" | lemonbar -o -1 -u 4 -a 32 -n "$PANEL_WM_NAME" -g "$PANEL_WIDTH"x"$PANEL_HEIGHT" -f "$PANEL_FONT" -f "$PANEL_ICON_FONT" -f "$PANEL_FALLBACK_FONT" -F "$COLOR_DEFAULT_FG" -B "$COLOR_DEFAULT_BG" | sh &
 
 wid=$(xdo id -a "$PANEL_WM_NAME")
 tries_left=20
