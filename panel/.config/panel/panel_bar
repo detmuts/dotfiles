@@ -152,5 +152,6 @@ while read -r line ; do
             wmstate="${wmstate}"
 			;;
 	esac
-	printf "%s\n" "%{l}${wmstate}${title}%{c}${clock}%{r}%{+u}${net}${vol}${bat}%{-u}"
+	printf "%s\n" "%{l} ${wmstate}${title}%{c}${clock}%{r}%{+u}${net}${vol}${bat}%{-u}"
+  
 done

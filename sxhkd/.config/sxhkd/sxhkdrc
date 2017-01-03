@@ -50,8 +50,12 @@ super + y
 	bspc query -N -n focused.automatic && bspc node -n last.!automatic || bspc node last.leaf -n focused
 
 # swap the current node and the biggest node
-super + g
-	bspc node -s biggest
+#super + g
+#	bspc node -s biggest
+
+# gaps
+super + {_,shift + }g
+      bspc config window_gap $(($(bspc config window_gap) {+,-} 5))
 
 #
 # state/flags
