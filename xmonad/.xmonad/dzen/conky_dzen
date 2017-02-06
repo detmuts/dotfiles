@@ -1,0 +1,36 @@
+conky.config={
+format_human_readable=true,
+out_to_console=true,
+out_to_x=false,
+override_utf8_locale=true,
+update_interval=0.5,
+update_interval_on_battery=1,
+use_spacer="left",
+use_xft=true,
+}
+
+function interp(str, vars)
+  -- Allow interp{str, vars} syntax as well as interp(str, {vars})
+  if not vars then
+    vars = str
+    str = vars[1]
+  end
+  return (string.gsub(str, "#({([^}]+)})",
+    function(whole,i)
+      return vars[i] or whole
+    end))
+end
+
+conky.text=interp
+{[[
+^ca(1,#{dzendir}/sc #{scriptdir}/dzen_date.sh) ^fg(\#c0c5ce)^i(#{icondir}/clock.xbm) ^fg(\#f2f2f2)${time %H:%M:%S}  ^ca()\
+^ca(1,#{dzendir}/sc #{scriptdir}/dzen_network.sh) ^fg(\#c0c5ce)${execi 2 #{scriptdir}/bar_wifi.sh}^fg(\#f2f2f2)  ^ca()\
+^ca(1,#{dzendir}/sc #{scriptdir}/dzen_vol.sh) ^fg(\#c0c5ce)${execi 2 #{scriptdir}/bar_vol.sh}^fg(\#f2f2f2)  ^ca()\
+^ca(1,#{dzendir}/sc #{scriptdir}/dzen_battery.sh) ^fg(\#c0c5ce)${execi 2 #{scriptdir}/bar_battery.sh}^fg(\#f2f2f2)  ^ca()\
+^ca(1,#{dzendir}/sc #{scriptdir}/dzen_hardware.sh) ^fg(\#c0c5ce)${execi 2 #{scriptdir}/bar_ram.sh}^fg(\#f2f2f2)  ^ca()\
+ ^fg(\#f2f2f2)^i(#{icondir}/arch_10x10.xbm)  ^fg(\#f2f2f2)^ca()
+]],
+dzendir="/home/detlev/.xmonad/dzen",
+scriptdir="/home/detlev/.xmonad/dzen/scripts",
+icondir="/home/detlev/.xmonad/icons/"
+}

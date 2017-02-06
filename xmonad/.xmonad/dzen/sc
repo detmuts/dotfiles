@@ -1,0 +1,21 @@
+#!/bin/bash
+
+if [ $(pgrep feh | wc -w) -gt 0 ]; then
+	kill $(pgrep feh | tail -n1);
+fi
+
+# Check if $1 != currently running
+# If it's the same, kill it, else, kill old and open new
+running=`pgrep -f dzen-popup`
+if [ -n "$running"  ]; then
+  parent=$(ps -p $running -o ppid=)
+  cmd=$(ps -p $parent -o command= | awk -F'[ ]' '{ print $2}')
+  if [ "$1" == "$cmd" ]; then
+	    kill $running
+  else
+      kill $running
+      $1
+  fi
+else
+	$1
+fi

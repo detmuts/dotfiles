@@ -81,8 +81,8 @@ set list
 set listchars=tab:\ \ ,trail:·
 
 " Colourscheme
-set background=dark
-colorscheme hybrid_reverse
+" set background=dark
+" colorscheme hybrid_reverse
 
 " Clipboard
 if has ('unnamedplus')
@@ -152,11 +152,11 @@ let g:goyo_heigth=85
 set laststatus=2
 let g:airline_powerline_fonts=1
 let g:airline_exclude_preview=1
-let g:airline_theme='base16_ocean'
+let g:airline_theme='hybridline'
 let g:airline_left_sep=''
 let g:airline_right_sep=''
 
-autocmd FileType ruby,erb,html,javascript,css,scss,yaml setlocal shiftwidth=2 tabstop=2
+autocmd FileType ruby,erb,html,javascript,yaml setlocal shiftwidth=2 tabstop=2
 
 " Functions
 "

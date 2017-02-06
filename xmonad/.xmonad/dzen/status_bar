@@ -1,0 +1,6 @@
+#!/bin/bash
+foreground=$1
+background=$2
+font=$3
+
+conky -qc /home/detlev/.xmonad/dzen/conky_dzen | dzen2 -x 920 -w 1000 -h 30 -ta r -bg "$background" -fg "$foreground" -y 0 -fn "$font" -e "onstart=lower" -dock &
