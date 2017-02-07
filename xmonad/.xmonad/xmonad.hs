@@ -30,7 +30,7 @@ import XMonad.Util.Scratchpad
 -- import XMonad.Util.NamedScratchpad
 
 import XMonad.Layout.Spacing
-import XMonad.Layout.NoBorders              (smartBorders)
+import XMonad.Layout.NoBorders              (smartBorders, withBorder, noBorders)
 import XMonad.Layout.WindowNavigation       (Direction2D (..), Navigate (..),
                                              windowNavigation)
 import XMonad.Layout.Fullscreen             (fullscreenFull)
@@ -58,7 +58,7 @@ baseConfig = desktopConfig {
     clickJustFocuses   = False,
     modMask            = mod4Mask,
     borderWidth        = 2,
-    normalBorderColor  = "#65737e",
+    normalBorderColor  = "#c0c5ce",
     focusedBorderColor = "#2b303b",
     workspaces         = myWorkspaces
     }
@@ -143,10 +143,9 @@ myLauncher = "rofi -show drun -theme ~/Documents/Scripts/Rofi/Themes/detvdael.ra
 myLayout = myLayoutModifiers myLayouts
 myLayoutModifiers = desktopLayoutModifiers
                     . smartBorders
-                    . smartSpacing 15
                     . windowNavigation
                     . trackFloating
-myLayouts = tallLayout ||| fullscreenFull Full
+myLayouts = (tallLayout) ||| (smartSpacing 15 $ tallLayout) ||| fullscreenFull Full
             where tallLayout = Tall 1 (3/100) (54/100)
 
 myScratchpadManageHook :: ManageHook
