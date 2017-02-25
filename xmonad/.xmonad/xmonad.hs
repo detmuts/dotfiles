@@ -14,6 +14,7 @@ import XMonad.Actions.CycleWS               (Direction1D (..), WSType (..),
                                              moveTo, nextWS, prevWS, toggleWS,
                                              shiftToNext, shiftToPrev)
 import XMonad.Actions.SpawnOn               (manageSpawn, spawnHere, spawnAndDo)
+import XMonad.Actions.GridSelect as GS
 import XMonad.Config.Desktop                (desktopConfig, desktopLayoutModifiers)
 import qualified XMonad.Hooks.DynamicLog    as DL
 import qualified XMonad.Hooks.ManageHelpers as MH
@@ -40,8 +41,9 @@ import XMonad.Layout.MultiToggle.Instances
 
 main :: IO()
 main = do
-    panelHandle    <- spawnPipe "dzen2 -x 0 -y 0 -h 30 -ta l -w 920 -fg '#f2f2f2' -bg '#2b303b' -fn 'Roboto Mono-10' -p -e 'onstart=lower' -dock"
-    _              <- spawnPipe "~/.xmonad/dzen/status_bar '#f2f2f2' '#2b303b' 'Roboto Mono-11'"
+    panelHandle    <- spawnPipe "dzen2 -x 0 -y 0 -h 30 -ta l -w 920 -fg '#f2f2f2' -bg '#000000' -fn 'Roboto Mono-10' -p -e 'onstart=lower' -dock"
+    -- _              <- spawnPipe "~/.xmonad/dzen/status_bar '#f2f2f2' '#2b303b' 'Roboto Mono-11'"
+    _              <- spawnPipe "~/.xmonad/dzen/status_bar '#f2f2f2' '#000000' 'Roboto Mono-11'"
 
     xmonad $ withUrgencyHook focusHook $ baseConfig {
         keys            = \conf -> EZ.mkKeymap conf (myKeyBindings conf),
@@ -57,9 +59,9 @@ baseConfig = desktopConfig {
     focusFollowsMouse  = False,
     clickJustFocuses   = False,
     modMask            = mod4Mask,
-    borderWidth        = 2,
-    normalBorderColor  = "#c0c5ce",
-    focusedBorderColor = "#2b303b",
+    borderWidth        = 1,
+    normalBorderColor  = "#2b303b",
+    focusedBorderColor = "#c0c5ce",
     workspaces         = myWorkspaces
     }
 
@@ -75,7 +77,7 @@ myKeyBindings conf =
     -- Spawning
     [ ("M-<Return>", spawnHere $ terminal conf)
     , ("M-S-<Return>", spawnHere "urxvtc -name 'urxvt-float'")
-    , ("M-r", spawnHere "urxvtc -e ranger")
+    , ("M-r", spawnHere "urxvtc -name 'urxvt-float' -e 'ranger'")
     , ("M-e", spawn "emacsclient -c")
     , ("M1-S-3", spawn "mixx -f")
     , ("M1-S-4", spawn "sleep 0.5; mixx -s")
@@ -85,6 +87,8 @@ myKeyBindings conf =
     , ("M-m", scratchpadSpawnAction conf)
     , ("M-b", spawn "/home/detlev/.xmonad/dzen/sc /home/detlev/.xmonad/dzen/scripts/dzen_battery.sh")
     , ("M-p", spawn "rofi -show pass -theme $SCRIPTDIR/Rofi/Themes/detvdael.rasi")
+    , ("M-g", goToSelected GS.def)
+    , ("M-k", bringSelected GS.def)
 
     -- Quit XMonad
     , ("M-S-c", io exitSuccess)
@@ -145,8 +149,9 @@ myLayoutModifiers = desktopLayoutModifiers
                     . smartBorders
                     . windowNavigation
                     . trackFloating
-myLayouts = (tallLayout) ||| (smartSpacing 15 $ tallLayout) ||| fullscreenFull Full
+myLayouts = (tallLayout) ||| fullscreenFull Full
             where tallLayout = Tall 1 (3/100) (54/100)
+-- Gapped layout : (smartSpacing 15 $ tallLayout)
 
 myScratchpadManageHook :: ManageHook
 myScratchpadManageHook = scratchpadManageHook (W.RationalRect 0.3 0.3 0.4 0.4)
@@ -186,7 +191,7 @@ myLogHook panelHandle = DL.dynamicLogWithPP $ def
     , DL.ppOutput               = IO.hPutStrLn panelHandle
     }
 
-background = "#2b303b"
+background = "#000000"
 foreground = "#f2f2f2"
 color1 =  "#bf616a"
 color2 = "#667175"

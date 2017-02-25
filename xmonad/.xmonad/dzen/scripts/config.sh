@@ -1,6 +1,6 @@
 #!/bin/bash
 
-background="#2b303b"
+background="#000000"
 foreground="#f2f2f2"
 highlight="#c0c5ce"
 

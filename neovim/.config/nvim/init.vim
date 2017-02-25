@@ -29,7 +29,7 @@ Plug 'easymotion/vim-easymotion'
 "Pretty colours
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'kristijanhusak/vim-hybrid-material'
+Plug 'chriskempson/base16-vim'
 
 call plug#end()
 
@@ -81,8 +81,10 @@ set list
 set listchars=tab:\ \ ,trail:·
 
 " Colourscheme
-" set background=dark
-" colorscheme hybrid_reverse
+if filereadable(expand("~/.vimrc_background"))
+  let base16colorspace=256
+  source ~/.vimrc_background
+endif
 
 " Clipboard
 if has ('unnamedplus')
@@ -190,3 +192,4 @@ if exists("+showtabline")
      set stal=2
      set tabline=%!MyTabLine()
 endif
+

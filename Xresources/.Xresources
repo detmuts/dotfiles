@@ -7,46 +7,66 @@ Xft.rgba: rgb
 Xft.hinting: true
 Xft.hintstyle: hintslight
 
-*background: #f2f2f2
-*foreground: #4f5b66
-! black
-*color0: #2b303b
-*color8: #65737e
-! red
-*color1: #bf616a
-*color9: #bf616a
-! green
-*color2: #a3be8c
-*color10: #a3be8c
-! yellow
-*color3: #debc78
-*color11: #debc78
-! blue
-*color4: #8fa1b3
-*color12: #8fa1b3
-! magenta
-*color5: #b48ead
-*color13: #b48ead
-! cyan
-*color6: #96b5b4
-*color14: #96b5b4
-! white
-*color7: #c0c5ce
-*color15: #f2f2f2
+! Tomorrow night bright
+*foreground:   #eaeaea
+*background:   #000000
+*cursorColor:  #aeafad
+*color0:       #000000
+*color1:       #912226
+*color2:       #778900
+*color3:       #ae7b00
+*color4:       #1d2594
+*color5:       #682a9b
+*color6:       #2b6651
+*color7:       #929593
+*color8:       #666666
+*color9:       #cc6666
+*color10:      #b5bd68
+*color11:      #f0c674
+*color12:      #81a2be
+*color13:      #b294bb
+*color14:      #8abeb7
+*color15:      #ecebec
+
+! LIGHT THEME
+!*background: #f2f2f2
+!*foreground: #4f5b66
+!! black
+!*color0: #2b303b
+!*color8: #65737e
+!! red
+!*color1: #bf616a
+!*color9: #bf616a
+!! green
+!*color2: #a3be8c
+!*color10: #a3be8c
+!! yellow
+!*color3: #debc78
+!*color11: #debc78
+!! blue
+!*color4: #8fa1b3
+!*color12: #8fa1b3
+!! magenta
+!*color5: #b48ead
+!*color13: #b48ead
+!! cyan
+!*color6: #96b5b4
+!*color14: #96b5b4
+!! white
+!*color7: #c0c5ce
+!*color15: #f2f2f2
 
 ! URxvt settings
 URxvt*.internalBorder:   10
 
 URxvt.scrollBar: false
 
-URxvt.font: xft:Roboto Mono:pixelsize=14:style=Regular
-URxvt.imFont: xft:Roboto Mono:pixelsize=14:style=Regular
-URxvt.boldFont: xft:Roboto Mono:pixelsize=14:style=Regular
-URxvt.italicFont: xft:Roboto Mono:pixelsize=14:style=Regular
-URxvt.boldItalicFont: xft:Roboto Mono:pixelsize=14:style=Regular
+URxvt.font: xft:Meslo LG M DZ:pixelsize=13:style=Regular
+URxvt.boldFont: xft:Meslo LG M DZ:pixelsize=13:style=Bold
+URxvt.italicFont: xft:Meslo LG M DZ:pixelsize=13:style=Italic
+URxvt.boldItalicFont: xft:Meslo LG M DZ:pixelsize=13:style=Bold Italic
 
 URxvt.letterSpace: -1
-
 
 rofi.modi:                           drun,run,ssh,pass:/home/detlev/Documents/Scripts/rofi-pass.sh
 ! "Y-offset relative to location" Set from: Default
