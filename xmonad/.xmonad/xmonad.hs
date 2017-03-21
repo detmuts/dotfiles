@@ -27,8 +27,7 @@ import qualified XMonad.StackSet            as W
 
 import XMonad.Util.EZConfig                 as EZ
 import XMonad.Util.Run                      (spawnPipe)
-import XMonad.Util.Scratchpad
--- import XMonad.Util.NamedScratchpad
+import XMonad.Util.NamedScratchpad
 
 import XMonad.Layout.Spacing
 import XMonad.Layout.NoBorders              (smartBorders, withBorder, noBorders)
@@ -36,19 +35,16 @@ import XMonad.Layout.WindowNavigation       (Direction2D (..), Navigate (..),
                                              windowNavigation)
 import XMonad.Layout.Fullscreen             (fullscreenFull)
 import XMonad.Layout.TrackFloating
-import XMonad.Layout.MultiToggle
-import XMonad.Layout.MultiToggle.Instances
 
 main :: IO()
 main = do
     panelHandle    <- spawnPipe "dzen2 -x 0 -y 0 -h 30 -ta l -w 920 -fg '#f2f2f2' -bg '#000000' -fn 'Roboto Mono-10' -p -e 'onstart=lower' -dock"
-    -- _              <- spawnPipe "~/.xmonad/dzen/status_bar '#f2f2f2' '#2b303b' 'Roboto Mono-11'"
     _              <- spawnPipe "~/.xmonad/dzen/status_bar '#f2f2f2' '#000000' 'Roboto Mono-11'"
 
     xmonad $ withUrgencyHook focusHook $ baseConfig {
         keys            = \conf -> EZ.mkKeymap conf (myKeyBindings conf),
         layoutHook      = myLayout,
-        manageHook      = myScratchpadManageHook <+> manageDocks <+> myManageHook <+> dynamicMasterHook <+> manageHook baseConfig,
+        manageHook      = namedScratchpadManageHook myScratchpads <+> manageDocks <+> myManageHook <+> dynamicMasterHook <+> manageHook baseConfig,
         handleEventHook = myEventHook <+> handleEventHook baseConfig,
         logHook         = myLogHook panelHandle <+> logHook baseConfig,
         startupHook     = startupHook baseConfig <+> myStartupHook
@@ -72,23 +68,33 @@ myWorkspaces = map (clickable . DL.dzenEscape) wsList
     wsid w = fromJust $ elemIndex w wsList
     wsList = ["HOME", "WEB", "CODE", "MEDIA"] ++ map show ([5..9] :: [Int])
 
+myScratchpads = [
+  -- Messenger manages its own window state and geometry
+  NS "messenger" "/opt/messengerfordesktop/messengerfordesktop" (className =? "Messenger for Desktop") (customFloating $ W.RationalRect (1/6)(1/8)(2/3)(3/4)),
+  NS "tmux" "urxvtc -name 'urxvt-dropdown' -e 'tmux'" (resource =? "urxvt-dropdown") (customFloating $ W.RationalRect (0)(30/1080)(1)(2/5)),
+  NS "scratchpad" "urxvtc -name 'scratchpad'" (resource =? "scratchpad") (customFloating $ W.RationalRect 0.3 0.3 0.4 0.4)
+                ]
+
 myKeyBindings :: forall (l :: * -> *). XConfig l -> [(String, X ())]
 myKeyBindings conf =
     -- Spawning
     [ ("M-<Return>", spawnHere $ terminal conf)
     , ("M-S-<Return>", spawnHere "urxvtc -name 'urxvt-float'")
     , ("M-r", spawnHere "urxvtc -name 'urxvt-float' -e 'ranger'")
+    , ("M-z", spawnHere "zeal")
     , ("M-e", spawn "emacsclient -c")
     , ("M1-S-3", spawn "mixx -f")
     , ("M1-S-4", spawn "sleep 0.5; mixx -s")
     , ("M1-S-5", spawn "sleep 0.5; mixx -v")
     , ("M-l", spawn "xsecurelock auth_pam_x11 saver_blank")
     , ("M-<Space>", spawn myLauncher)
-    , ("M-m", scratchpadSpawnAction conf)
     , ("M-b", spawn "/home/detlev/.xmonad/dzen/sc /home/detlev/.xmonad/dzen/scripts/dzen_battery.sh")
     , ("M-p", spawn "rofi -show pass -theme $SCRIPTDIR/Rofi/Themes/detvdael.rasi")
-    , ("M-g", goToSelected GS.def)
-    , ("M-k", bringSelected GS.def)
+    -- , ("M-g", goToSelected GS.def)
+    -- , ("M-y", bringSelected GS.def)
+    , ("M-m", namedScratchpadAction myScratchpads "scratchpad")
+    , ("M-o", namedScratchpadAction myScratchpads "messenger")
+    , ("M-j", namedScratchpadAction myScratchpads "tmux")
 
     -- Quit XMonad
     , ("M-S-c", io exitSuccess)
@@ -98,7 +104,6 @@ myKeyBindings conf =
     -- Layout
     , ("M-f", sendMessage NextLayout)
     , ("M-s", withFocused $ windows . toggleFloat)
-    , ("M-z", sendMessage $ Toggle NBFULL)
 
     -- Focus
     , ("M-<Tab>", windows W.focusDown)
@@ -135,7 +140,7 @@ myKeyBindings conf =
     , ("<XF86AudioLowerVolume>", spawn "amixer -c 0 set Master 5-")
     , ("<XF86AudioMute>", spawn "amixer -D pulse set Master Playback Switch toggle")
     -- Not working until kernel 4.10 patch
-    --, ("<XF86MonBrightnessUp>", spawn "xbacklight -dec 10")
+    --, ("<XF85MonBrightnessUp>", spawn "xbacklight -dec 10")
     --, ("<XF86MonBrightnessDown>", spawn "xbacklight -inc 10")
     , ("M-<F5>", spawn "xbacklight -dec 10")
     , ("M-<F6>", spawn "xbacklight -inc 10")
@@ -145,32 +150,32 @@ myLauncher :: String
 myLauncher = "rofi -show drun -theme ~/Documents/Scripts/Rofi/Themes/detvdael.rasi"
 
 myLayout = myLayoutModifiers myLayouts
-myLayoutModifiers = desktopLayoutModifiers
+myLayoutModifiers = trackFloating
+                    . desktopLayoutModifiers
                     . smartBorders
                     . windowNavigation
-                    . trackFloating
 myLayouts = (tallLayout) ||| fullscreenFull Full
             where tallLayout = Tall 1 (3/100) (54/100)
 -- Gapped layout : (smartSpacing 15 $ tallLayout)
-
-myScratchpadManageHook :: ManageHook
-myScratchpadManageHook = scratchpadManageHook (W.RationalRect 0.3 0.3 0.4 0.4)
 
 myManageHook :: ManageHook
 myManageHook = composeAll
     [ manageSpawn
     -- Floats
-    , MH.isDialog               --> doFloat
-    , MH.isFullscreen           --> MH.doFullFloat
-    , resource =? "urxvt-float" --> MH.doCenterFloat
-    , resource =? "mpv-youtube" --> MH.doFullFloat <+> doShift (myWorkspaces !! 1)
+    , MH.isDialog                          --> doFloat
+    , MH.isFullscreen                      --> MH.doFullFloat
+    , resource =? "urxvt-float"            --> MH.doRectFloat(W.RationalRect 0.3 0.3 0.4 0.4)
+    , resource =? "urxvt-dropdown"         --> MH.doRectFloat(W.RationalRect (0)(30/1080)(1)(1/3))
+    , resource =? "mpv-youtube"            --> MH.doFullFloat <+> doShift (myWorkspaces !! 1)
+    , className =? "Messenger for Desktop" --> MH.doRectFloat(W.RationalRect (1/6)(1/8)(2/3)(3/4))
     -- Shifts
     , className =? "Firefox"    --> doShift (myWorkspaces !! 1)
     , className =? "Waterfox"   --> doShift (myWorkspaces !! 1)
     , className =? "Emacs"      --> doShift (myWorkspaces !! 2)
     , className =? "mpv"        --> doShift (myWorkspaces !! 3)
     , resource =? "libreoffice" --> doShift (myWorkspaces !! 3)
-    , className =? "Gimp-2.8"   --> doShift (myWorkspaces !! 4)
+    , className =? "Steam"      --> doShift (myWorkspaces !! 4)
+    , className =? "Gimp-2.8"   --> doShift (myWorkspaces !! 5)
     ]
 
 myEventHook :: Event -> X All
