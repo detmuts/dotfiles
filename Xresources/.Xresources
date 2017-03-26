@@ -68,7 +68,7 @@ URxvt.boldItalicFont: xft:Meslo LG M DZ:pixelsize=13:style=Bold Italic
 
 URxvt.letterSpace: -1
 
-rofi.modi:                           drun,run,ssh,pass:/home/detlev/Documents/Scripts/rofi-pass.sh
+rofi.modi:                           drun,run,ssh,pass:rofi-pass.sh
 ! "Y-offset relative to location" Set from: Default
 ! rofi.yoffset:                        30
 ! "X-offset relative to location" Set from: Default
