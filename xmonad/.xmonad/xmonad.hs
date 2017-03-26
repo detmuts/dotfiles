@@ -22,6 +22,7 @@ import XMonad.Hooks.DynamicHooks            (dynamicMasterHook)
 import XMonad.Hooks.UrgencyHook             (focusHook, withUrgencyHook)
 import XMonad.Hooks.EwmhDesktops            (fullscreenEventHook)
 import XMonad.Hooks.ManageDocks             (docksEventHook, manageDocks)
+import XMonad.Hooks.SetWMName
 
 import qualified XMonad.StackSet            as W
 
@@ -205,6 +206,7 @@ color3 = "#8a919e"
 myStartupHook :: X ()
 myStartupHook = do
     EZ.checkKeymap baseConfig (myKeyBindings baseConfig)
+    setWMName "LG3D"
     addFullscreenSupport
 
 addFullscreenSupport :: X ()
