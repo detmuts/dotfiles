@@ -3,28 +3,28 @@
 call plug#begin('~/.config/nvim/plugged')
 
 "Editing
-Plug 'junegunn/vim-easy-align', { 'on': ['<PLug>(EasyAlign)', 'EasyAlign'] }
+" Plug 'junegunn/vim-easy-align', { 'on': ['<PLug>(EasyAlign)', 'EasyAlign'] }
 Plug 'junegunn/goyo.vim'
 Plug 'Raimondi/delimitmate'
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'scrooloose/nerdcommenter'
 Plug 'scrooloose/syntastic'
 Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
-Plug 'Shougo/deoplete.nvim'
-Plug 'Shougo/echodoc.vim', { 'on': 'EchoDocEnable' }
-Plug 'Shougo/context_filetype.vim'
+" Plug 'Shougo/deoplete.nvim'
+" Plug 'Shougo/echodoc.vim', { 'on': 'EchoDocEnable' }
+" Plug 'Shougo/context_filetype.vim'
 
 "Searching
 Plug 'mhinz/vim-grepper', { 'on': 'Grepper' }
 Plug 'junegunn/fzf', { 'on': 'FZF', 'dir': '~/.fzf', 'do': './install --all' }
 
 "Language specific
-Plug 'zchee/deoplete-jedi'
-Plug 'osyo-manga/vim-monster'
-Plug 'carlitux/deoplete-ternjs'
+" Plug 'zchee/deoplete-jedi'
+" Plug 'osyo-manga/vim-monster'
+" Plug 'carlitux/deoplete-ternjs'
 
 "Navigation
-Plug 'easymotion/vim-easymotion'
+" Plug 'easymotion/vim-easymotion'
 
 "Pretty colours
 Plug 'vim-airline/vim-airline'
@@ -81,6 +81,7 @@ set list
 set listchars=tab:\ \ ,trail:·
 
 " Colourscheme
+"colorscheme ryuuko
 if filereadable(expand("~/.vimrc_background"))
   let base16colorspace=256
   source ~/.vimrc_background

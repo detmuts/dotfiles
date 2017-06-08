@@ -7,7 +7,7 @@ import Data.Monoid                          (All)
 import qualified Data.Map                   as M
 
 import System.Exit                          (exitSuccess)
-import System.IO                            as IO
+import qualified System.IO                  as IO
 
 import XMonad
 import XMonad.Actions.CycleWS               (Direction1D (..), WSType (..),
@@ -16,11 +16,11 @@ import XMonad.Actions.CycleWS               (Direction1D (..), WSType (..),
 import XMonad.Actions.SpawnOn               (manageSpawn, spawnHere, spawnAndDo)
 import XMonad.Actions.GridSelect as GS
 import XMonad.Config.Desktop                (desktopConfig, desktopLayoutModifiers)
-import qualified XMonad.Hooks.DynamicLog    as DL
 import qualified XMonad.Hooks.ManageHelpers as MH
+import XMonad.Hooks.DynamicLog              as DL
 import XMonad.Hooks.DynamicHooks            (dynamicMasterHook)
 import XMonad.Hooks.UrgencyHook             (focusHook, withUrgencyHook)
-import XMonad.Hooks.EwmhDesktops            (fullscreenEventHook)
+import XMonad.Hooks.EwmhDesktops
 import XMonad.Hooks.ManageDocks             (docksEventHook, manageDocks)
 import XMonad.Hooks.SetWMName
 
@@ -39,16 +39,24 @@ import XMonad.Layout.TrackFloating
 
 main :: IO()
 main = do
-    panelHandle    <- spawnPipe "dzen2 -x 0 -y 0 -h 30 -ta l -w 920 -fg '#f2f2f2' -bg '#000000' -fn 'Roboto Mono-10' -p -e 'onstart=lower' -dock"
-    _              <- spawnPipe "~/.xmonad/dzen/status_bar '#f2f2f2' '#000000' 'Roboto Mono-11'"
+--    panelHandle    <- spawnPipe "dzen2 -x 0 -y 0 -h 30 -ta l -w 920 -fg '#f2f2f2' -bg '#000000' -fn 'Roboto Mono-10' -p -e 'onstart=lower' -dock"
+--    _              <- spawnPipe "~/.xmonad/dzen/status_bar '#f2f2f2' '#000000' 'Roboto Mono-11'"
+    _ <- spawnPipe "/usr/bin/polybar example"
 
-    xmonad $ withUrgencyHook focusHook $ baseConfig {
+    xmonad $ baseConfig {
         keys            = \conf -> EZ.mkKeymap conf (myKeyBindings conf),
         layoutHook      = myLayout,
-        manageHook      = namedScratchpadManageHook myScratchpads <+> manageDocks <+> myManageHook <+> dynamicMasterHook <+> manageHook baseConfig,
-        handleEventHook = myEventHook <+> handleEventHook baseConfig,
-        logHook         = myLogHook panelHandle <+> logHook baseConfig,
-        startupHook     = startupHook baseConfig <+> myStartupHook
+        manageHook      = myManageHook
+                            <+> namedScratchpadManageHook myScratchpads
+                            <+> manageDocks
+                            <+> dynamicMasterHook
+                            <+> manageHook baseConfig,
+        handleEventHook = fullscreenEventHook
+                            <+> docksEventHook
+                            <+> handleEventHook baseConfig,
+        logHook         = logHook baseConfig,
+        startupHook     = startupHook baseConfig
+                            <+> myStartupHook
     }
 
 baseConfig = desktopConfig {
@@ -62,19 +70,12 @@ baseConfig = desktopConfig {
     workspaces         = myWorkspaces
     }
 
-myWorkspaces :: [String]
-myWorkspaces = map (clickable . DL.dzenEscape) wsList
-  where
-    clickable ws = DL.wrap ("^ca(1,wmctrl -s " ++ show (wsid ws) ++ ")") "^ca()" . DL.pad $ ws
-    wsid w = fromJust $ elemIndex w wsList
-    wsList = ["HOME", "WEB", "CODE", "MEDIA"] ++ map show ([5..9] :: [Int])
+myWorkspaces = ["home", "web", "code", "media", "game"]
 
 myScratchpads = [
-  -- Messenger manages its own window state and geometry
-  NS "messenger" "/opt/messengerfordesktop/messengerfordesktop" (className =? "Messenger for Desktop") (customFloating $ W.RationalRect (1/6)(1/8)(2/3)(3/4)),
+  NS "IM" "/usr/bin/rambox" (className =? "Rambox") (customFloating $ W.RationalRect (1/6)(1/8)(2/3)(3/4)),
   NS "tmux" "urxvtc -name 'urxvt-dropdown' -e 'tmux'" (resource =? "urxvt-dropdown") (customFloating $ W.RationalRect (0)(30/1080)(1)(2/5)),
-  NS "scratchpad" "urxvtc -name 'scratchpad'" (resource =? "scratchpad") (customFloating $ W.RationalRect 0.3 0.3 0.4 0.4)
-                ]
+  NS "scratchpad" "urxvtc -name 'scratchpad'" (resource =? "scratchpad") (customFloating $ W.RationalRect 0.3 0.3 0.4 0.4)]
 
 myKeyBindings :: forall (l :: * -> *). XConfig l -> [(String, X ())]
 myKeyBindings conf =
@@ -91,16 +92,15 @@ myKeyBindings conf =
     , ("M-<Space>", spawn myLauncher)
     , ("M-b", spawn "/home/detlev/.xmonad/dzen/sc /home/detlev/.xmonad/dzen/scripts/dzen_battery.sh")
     , ("M-p", spawn "rofi -show pass -theme $SCRIPTDIR/Rofi/Themes/detvdael.rasi")
-    -- , ("M-g", goToSelected GS.def)
-    -- , ("M-y", bringSelected GS.def)
     , ("M-m", namedScratchpadAction myScratchpads "scratchpad")
-    , ("M-o", namedScratchpadAction myScratchpads "messenger")
+    , ("M-o", namedScratchpadAction myScratchpads "IM")
     , ("M-j", namedScratchpadAction myScratchpads "tmux")
+    , ("M-u", spawn "mpc toggle")
 
     -- Quit XMonad
     , ("M-S-c", io exitSuccess)
     -- Restart XMonad
-    , ("M-c", spawn "xmonad --recompile; killall dzen2; xmonad --restart")
+    , ("M-c", spawn "xmonad --recompile; killall -9 polybar; xmonad --restart")
 
     -- Layout
     , ("M-f", sendMessage NextLayout)
@@ -121,8 +121,8 @@ myKeyBindings conf =
     , ("M-S-<Right>", sendMessage $ Swap R)
 
     -- Workspace Controls
-    , ("M-n", moveTo Next NonEmptyWS)
-    , ("M-t", moveTo Prev NonEmptyWS)
+    , ("C-M1-<Right>", moveTo Next NonEmptyWS)
+    , ("C-M1-<Left>", moveTo Prev NonEmptyWS)
 
     -- Resizing
     , ("M-C-h", sendMessage Shrink)
@@ -156,7 +156,7 @@ myLayoutModifiers = trackFloating
                     . smartBorders
                     . windowNavigation
 myLayouts = (tallLayout) ||| fullscreenFull Full
-            where tallLayout = Tall 1 (3/100) (54/100)
+            where tallLayout = Tall 1 (3/100) (1/2)
 -- Gapped layout : (smartSpacing 15 $ tallLayout)
 
 myManageHook :: ManageHook
@@ -168,56 +168,48 @@ myManageHook = composeAll
     , resource =? "urxvt-float"            --> MH.doRectFloat(W.RationalRect 0.3 0.3 0.4 0.4)
     , resource =? "urxvt-dropdown"         --> MH.doRectFloat(W.RationalRect (0)(30/1080)(1)(1/3))
     , resource =? "mpv-youtube"            --> MH.doFullFloat <+> doShift (myWorkspaces !! 1)
-    , className =? "Messenger for Desktop" --> MH.doRectFloat(W.RationalRect (1/6)(1/8)(2/3)(3/4))
+    , resource =? "Toplevel"               --> MH.doRectFloat(W.RationalRect (9/20)(9/20)(11/20)(11/20))
     -- Shifts
-    , className =? "Firefox"    --> doShift (myWorkspaces !! 1)
-    , className =? "Waterfox"   --> doShift (myWorkspaces !! 1)
-    , className =? "Emacs"      --> doShift (myWorkspaces !! 2)
-    , className =? "mpv"        --> doShift (myWorkspaces !! 3)
-    , resource =? "libreoffice" --> doShift (myWorkspaces !! 3)
-    , className =? "Steam"      --> doShift (myWorkspaces !! 4)
-    , className =? "Gimp-2.8"   --> doShift (myWorkspaces !! 5)
+    , className =? "Rambox"             --> doF W.focusDown
+    , className =? "Firefox"            --> doShift (myWorkspaces !! 1)
+    , className =? "FirefoxNightly"     --> doShift (myWorkspaces !! 1)
+    , className =? "Waterfox"           --> doShift (myWorkspaces !! 1)
+    , className =? "Emacs"              --> doShift (myWorkspaces !! 2)
+    , className =? "Code"               --> doShift (myWorkspaces !! 2)
+    , className =? "mpv"                --> doShift (myWorkspaces !! 3)
+    , resource =? "libreoffice"         --> doShift (myWorkspaces !! 3)
+    , className =? "Steam"              --> doShift (myWorkspaces !! 4)
+    , className =? "Gimp-2.8"           --> doShift (myWorkspaces !! 5)
     ]
-
-myEventHook :: Event -> X All
-myEventHook = fullscreenEventHook <+> docksEventHook
-
-myLogHook :: IO.Handle -> X ()
-myLogHook panelHandle = DL.dynamicLogWithPP $ def
-    { DL.ppCurrent              = \ws -> DL.dzenColor foreground background $ ws
-    , DL.ppVisible              = \ws -> DL.dzenColor color3 background $ ws
-    , DL.ppHidden               = \ws -> DL.dzenColor color3 background $ ws
-    , DL.ppHiddenNoWindows      = \ws -> DL.dzenColor color2 background $ ws
-    , DL.ppUrgent               = \ws -> DL.dzenColor color1 background $ ws
-    , DL.ppTitle                = \_ -> ""
-    , DL.ppLayout               = \_ -> ""
-    , DL.ppWsSep                = ""
-    , DL.ppSep                  = ""
-    , DL.ppOrder                = \(ws:_:_:_) -> [ws]
-    , DL.ppOutput               = IO.hPutStrLn panelHandle
-    }
-
-background = "#000000"
-foreground = "#f2f2f2"
-color1 =  "#bf616a"
-color2 = "#667175"
-color3 = "#8a919e"
 
 myStartupHook :: X ()
 myStartupHook = do
     EZ.checkKeymap baseConfig (myKeyBindings baseConfig)
     setWMName "LG3D"
-    addFullscreenSupport
+    fixEWMH
 
-addFullscreenSupport :: X ()
-addFullscreenSupport = withDisplay $ \dpy -> do
-    wm                <- asks theRoot
-    supportProp       <- getAtom "_NET_SUPPORTED"
-    atomType          <- getAtom "ATOM"
+fixEWMH :: X ()
+fixEWMH = withDisplay $ \dpy -> do
+    wm <- asks theRoot
+
+    atomType <- getAtom "ATOM"
+    cardinalType <- getAtom "CARDINAL"
+
+    supportProp <- getAtom "_NET_SUPPORTED"
+    desktopGeometryProp <- getAtom "_NET_DESKTOP_GEOMETRY"
     fullscreenSupport <- getAtom "_NET_WM_STATE_FULLSCREEN"
-    io $ changeProperty32 dpy wm supportProp atomType propModeAppend [fromIntegral fullscreenSupport]
 
--- Allows toggling floats instead of separata float and sink
+    io $ do
+        changeProperty32 dpy wm supportProp atomType propModeAppend
+                         [fromIntegral fullscreenSupport,
+                          fromIntegral desktopGeometryProp]
+        windowAttributes <- getWindowAttributes dpy wm
+        let width = fromIntegral $ wa_width windowAttributes
+            height = fromIntegral $ wa_height windowAttributes
+        changeProperty32 dpy wm desktopGeometryProp cardinalType propModeReplace
+                         [width, height]
+
+-- Allows toggling floats instead of separate float and sink
 toggleFloat :: Ord a => a -> W.StackSet i l a s sd -> W.StackSet i l a s sd
 toggleFloat w s@W.StackSet{W.floating = floating}
     | w `M.member` floating      = s { W.floating = M.delete w floating }
