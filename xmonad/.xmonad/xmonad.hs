@@ -87,7 +87,7 @@ myKeyBindings conf =
     , ("M-e", spawn "emacsclient -c")
     , ("M1-S-3", spawn "mixx -f")
     , ("M1-S-4", spawn "sleep 0.5; mixx -s")
-    , ("M1-S-5", spawn "sleep 0.5; mixx -v")
+    , ("M1-S-6", spawn "sleep 0.5; mixx -v")
     , ("M-l", spawn "xsecurelock auth_pam_x11 saver_blank")
     , ("M-<Space>", spawn myLauncher)
     , ("M-b", spawn "/home/detlev/.xmonad/dzen/sc /home/detlev/.xmonad/dzen/scripts/dzen_battery.sh")
