@@ -1,20 +1,28 @@
 (prelude-require-packages '(use-package))
 ;; General packages
 (use-package linum-relative
-  :ensure t)
-(global-linum-mode)
+  :ensure t
+  :config
+  (global-linum-mode))
 (use-package iedit
-  :ensure t)
+  :ensure t
+  :defer t)
 (use-package multiple-cursors
   :ensure t)
 (use-package persp-mode
-  :ensure t)
+  :ensure t
+  :config
+  (persp-mode t))
 (use-package pos-tip
   :ensure t)
 (use-package company-quickhelp
-  :ensure t)
-(company-quickhelp-mode 1)
-(setq company-quickhelp-delay 0.3)
+  :ensure t
+  :config
+  (company-quickhelp-mode 1)
+  (setq company-quickhelp-delay 0.3))
+(use-package restclient
+  :ensure t
+  :defer t)
 (use-package ruby-tools
   :ensure t
   :bind (:map ruby-tools-mode-map
@@ -33,15 +41,17 @@
             (setq helm-swoop-split-with-multiple-windows t)
             (setq helm-swoop-split-direction 'split-window-vertically)))
 (use-package paradox
-  :ensure t)
-(paradox-enable)
+  :ensure t
+  :config
+  (paradox-enable))
 (use-package rust-mode
   :ensure t)
 (use-package rvm
   :ensure t)
 (rvm-use-default)
 (use-package robe
-  :ensure t)
+  :ensure t
+  :defer t)
 (add-hook 'ruby-mode-hook 'robe-mode)
 (eval-after-load 'company
   '(push 'company-robe company-backends))
@@ -61,14 +71,22 @@
 (use-package color-theme-sanityinc-tomorrow
   :ensure t
   :defer t)
+(use-package all-the-icons
+  :ensure t
+  :defer t)
+(use-package neotree
+  :ensure t
+  :defer t
+  :config
+  (setq neo-theme (if (display-graphic-p) 'icons 'arrow)))
 (use-package org-bullets
   :ensure t)
 (add-hook 'org-mode-hook
           (lambda () (org-bullets-mode 1)))
 (setq org-src-fontify-natively t)
 
-(add-hook 'before-save-hook (lambda ()
-                              (delete-trailing-whitespace)))
+(add-hook 'before-save-hook
+          (lambda () (delete-trailing-whitespace)))
 (yas-global-mode 1)
 ;; Add yasnippet support for all company backends
 ;; https://github.com/syl20bnr/spacemacs/pull/179
@@ -82,7 +100,6 @@
             '(:with company-yasnippet))))
 (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 (setq helm-move-to-line-cycle-in-source nil)
-(scroll-bar-mode -1)
 (global-visual-line-mode)
 (indent-guide-global-mode)
 (setq browse-url-browser-function 'browse-url-generic
@@ -90,4 +107,5 @@
 ;; (setq guru-warn-only nil)
 (setq prelude-flyspell nil)
 (setq prelude-whitespace nil)
-(setq default-frame-alist '((font . "Meslo LG M DZ-10")))
+(if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+(add-to-list 'default-frame-alist '(font . "Meslo LG M DZ-10"))
