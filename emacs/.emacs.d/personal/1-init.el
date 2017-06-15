@@ -105,6 +105,7 @@
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "firefox-nightly")
 ;; (setq guru-warn-only nil)
+(setq next-line-add-newlines t) ;; Add newline when C-n is pressed at end of buffer
 (setq prelude-flyspell nil)
 (setq prelude-whitespace nil)
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
