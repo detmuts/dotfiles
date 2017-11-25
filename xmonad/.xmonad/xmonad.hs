@@ -42,7 +42,6 @@ main = do
 --    panelHandle    <- spawnPipe "dzen2 -x 0 -y 0 -h 30 -ta l -w 920 -fg '#f2f2f2' -bg '#000000' -fn 'Roboto Mono-10' -p -e 'onstart=lower' -dock"
 --    _              <- spawnPipe "~/.xmonad/dzen/status_bar '#f2f2f2' '#000000' 'Roboto Mono-11'"
     _ <- spawnPipe "/usr/bin/polybar example"
-
     xmonad $ baseConfig {
         keys            = \conf -> EZ.mkKeymap conf (myKeyBindings conf),
         layoutHook      = myLayout,
@@ -56,7 +55,7 @@ main = do
                             <+> handleEventHook baseConfig,
         logHook         = logHook baseConfig,
         startupHook     = startupHook baseConfig
-                            <+> myStartupHook
+                           <+> myStartupHook
     }
 
 baseConfig = desktopConfig {
@@ -141,8 +140,8 @@ myKeyBindings conf =
     , ("<XF86AudioLowerVolume>", spawn "amixer -c 0 set Master 5-")
     , ("<XF86AudioMute>", spawn "amixer -D pulse set Master Playback Switch toggle")
     -- Not working until kernel 4.10 patch
-    --, ("<XF85MonBrightnessUp>", spawn "xbacklight -dec 10")
-    --, ("<XF86MonBrightnessDown>", spawn "xbacklight -inc 10")
+    -- , ("<XF85MonBrightnessUp>", spawn "xbacklight -dec 10")
+    -- , ("<XF86MonBrightnessDown>", spawn "xbacklight -inc 10")
     , ("M-<F5>", spawn "xbacklight -dec 10")
     , ("M-<F6>", spawn "xbacklight -inc 10")
     ]
@@ -169,8 +168,10 @@ myManageHook = composeAll
     , resource =? "urxvt-dropdown"         --> MH.doRectFloat(W.RationalRect (0)(30/1080)(1)(1/3))
     , resource =? "mpv-youtube"            --> MH.doFullFloat <+> doShift (myWorkspaces !! 1)
     , resource =? "Toplevel"               --> MH.doRectFloat(W.RationalRect (9/20)(9/20)(11/20)(11/20))
+    , className =? "Pinentry"              --> doFloat
     -- Shifts
     , className =? "Rambox"             --> doF W.focusDown
+    , className =? "Icecat"             --> doShift (myWorkspaces !! 1)
     , className =? "Firefox"            --> doShift (myWorkspaces !! 1)
     , className =? "FirefoxNightly"     --> doShift (myWorkspaces !! 1)
     , className =? "Waterfox"           --> doShift (myWorkspaces !! 1)
@@ -184,30 +185,30 @@ myManageHook = composeAll
 
 myStartupHook :: X ()
 myStartupHook = do
-    EZ.checkKeymap baseConfig (myKeyBindings baseConfig)
-    setWMName "LG3D"
-    fixEWMH
+   EZ.checkKeymap baseConfig (myKeyBindings baseConfig)
+   setWMName "LG3D"
+   fixEWMH
 
 fixEWMH :: X ()
 fixEWMH = withDisplay $ \dpy -> do
-    wm <- asks theRoot
+   wm <- asks theRoot
 
-    atomType <- getAtom "ATOM"
-    cardinalType <- getAtom "CARDINAL"
+   atomType <- getAtom "ATOM"
+   cardinalType <- getAtom "CARDINAL"
 
-    supportProp <- getAtom "_NET_SUPPORTED"
-    desktopGeometryProp <- getAtom "_NET_DESKTOP_GEOMETRY"
-    fullscreenSupport <- getAtom "_NET_WM_STATE_FULLSCREEN"
+   supportProp <- getAtom "_NET_SUPPORTED"
+   desktopGeometryProp <- getAtom "_NET_DESKTOP_GEOMETRY"
+   fullscreenSupport <- getAtom "_NET_WM_STATE_FULLSCREEN"
 
-    io $ do
-        changeProperty32 dpy wm supportProp atomType propModeAppend
-                         [fromIntegral fullscreenSupport,
-                          fromIntegral desktopGeometryProp]
-        windowAttributes <- getWindowAttributes dpy wm
-        let width = fromIntegral $ wa_width windowAttributes
-            height = fromIntegral $ wa_height windowAttributes
-        changeProperty32 dpy wm desktopGeometryProp cardinalType propModeReplace
-                         [width, height]
+   io $ do
+       changeProperty32 dpy wm supportProp atomType propModeAppend
+                        [fromIntegral fullscreenSupport,
+                         fromIntegral desktopGeometryProp]
+       windowAttributes <- getWindowAttributes dpy wm
+       let width = fromIntegral $ wa_width windowAttributes
+           height = fromIntegral $ wa_height windowAttributes
+       changeProperty32 dpy wm desktopGeometryProp cardinalType propModeReplace
+                        [width, height]
 
 -- Allows toggling floats instead of separate float and sink
 toggleFloat :: Ord a => a -> W.StackSet i l a s sd -> W.StackSet i l a s sd
